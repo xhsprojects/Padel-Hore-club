@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 150 60% 97%; /* light mint */
+    --foreground: 145 60% 20%; /* dark green */
+    --card: 0 0% 100%; /* white */
+    --card-foreground: 145 60% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 145 60% 20%;
+    --primary: 145 60% 30%; /* main interactive green */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 150 27% 92%; /* light green for podium cards */
+    --secondary-foreground: 145 60% 20%;
+    --muted: 150 27% 92%; /* muted background, e.g., tabs list */
+    --muted-foreground: 145 60% 40%; /* muted text */
+    --accent: 150 27% 88%; /* hover state */
+    --accent-foreground: 145 60% 20%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 150 18% 85%;
+    --input: 0 0% 100%;
+    --ring: 145 60% 30%;
+    --radius: 1rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 145 60% 20%;
+    --sidebar-border: 150 18% 85%;
+    --sidebar-accent: 150 27% 92%;
+    --sidebar-accent-foreground: 145 60% 20%;
+    --sidebar-primary: 145 60% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-ring: 145 60% 30%;
+
+    /* Tier colors can remain, they are distinct */
+    --tier-beginner: 220 13% 69%;
+    --tier-lower-bronze: 30 54% 40%;
+    --tier-bronze: 30 54% 50%;
+    --tier-silver: 220 13% 80%;
+    --tier-gold: 45 96% 51%;
+    
+    /* Custom colors for match results */
+    --win: 142 76% 36%;
+    --loss: 0 72% 51%;
+    --draw: 215 20% 65%;
+  }
+
+  .dark {
+    /* Copy light theme here since the app was hardcoded to dark */
+    --background: 150 60% 97%;
+    --foreground: 145 60% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 145 60% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 145 60% 20%;
+    --primary: 145 60% 30%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 150 27% 92%;
+    --secondary-foreground: 145 60% 20%;
+    --muted: 150 27% 92%;
+    --muted-foreground: 145 60% 40%;
+    --accent: 150 27% 88%;
+    --accent-foreground: 145 60% 20%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 150 18% 85%;
+    --input: 0 0% 100%;
+    --ring: 145 60% 30%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 145 60% 20%;
+    --sidebar-border: 150 18% 85%;
+    --sidebar-accent: 150 27% 92%;
+    --sidebar-accent-foreground: 145 60% 20%;
+    --sidebar-primary: 145 60% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-ring: 145 60% 30%;
+  }
+}
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+    .glass-card {
+       /* Removing glass effect to match screenshot */
+    }
+    .rank-card-1, .rank-card-2, .rank-card-3 {
+        background-color: hsl(var(--secondary));
+        border: 1px solid hsl(var(--border));
+    }
+    .rank-card-1 {
+        border-width: 2px;
+        border-color: hsl(var(--primary));
+    }
+}

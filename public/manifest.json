@@ -1,0 +1,53 @@
+{
+  "name": "Geber Padel Club",
+  "short_name": "Geber Padel",
+  "description": "Leaderboard and social platform for the Geber Padel Club community.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0F172A",
+  "icons": [
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/studio-9868070855-4e715.firebasestorage.app/o/Geber-Padel.png?alt=media&token=d269993c-39d0-4129-8dfa-adc754dd4028",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/studio-9868070855-4e715.firebasestorage.app/o/Geber-Padel.png?alt=media&token=d269993c-39d0-4129-8dfa-adc754dd4028",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/studio-9868070855-4e715.firebasestorage.app/o/Geber-Padel.png?alt=media&token=d269993c-39d0-4129-8dfa-adc754dd4028",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/studio-9868070855-4e715.firebasestorage.app/o/Geber-Padel.png?alt=media&token=d269993c-39d0-4129-8dfa-adc754dd4028",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/studio-9868070855-4e715.firebasestorage.app/o/Geber-Padel.png?alt=media&token=d269993c-39d0-4129-8dfa-adc754dd4028",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/studio-9868070855-4e715.firebasestorage.app/o/Geber-Padel.png?alt=media&token=d269993c-39d0-4129-8dfa-adc754dd4028",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/studio-9868070855-4e715.firebasestorage.app/o/Geber-Padel.png?alt=media&token=d269993c-39d0-4129-8dfa-adc754dd4028",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/studio-9868070855-4e715.firebasestorage.app/o/Geber-Padel.png?alt=media&token=d269993c-39d0-4129-8dfa-adc754dd4028",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
