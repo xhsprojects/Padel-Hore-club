@@ -1,6 +1,5 @@
 'use client';
 
-import { getMessaging, getToken, isSupported } from 'firebase/messaging';
 import { getApp, FirebaseError } from 'firebase/app';
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from 'firebase/firestore';
 import type { Firestore } from 'firebase/firestore';
@@ -8,6 +7,25 @@ import { firebaseConfig } from './config';
 
 // --- VAPID key from Firebase project settings ---
 const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+
+/**
+ * Checks if the browser supports Firebase Messaging.
+ */
+export async function isSupported() {
+  if (typeof window === 'undefined') return false;
+  
+  // Basic browser support check for necessary APIs
+  if (!('serviceWorker' in navigator) || !('Notification' in window) || !('PushManager' in window)) {
+    return false;
+  }
+
+  try {
+    const { isSupported: firebaseIsSupported } = await import('firebase/messaging');
+    return await firebaseIsSupported();
+  } catch (e) {
+    return false;
+  }
+}
 
 /**
  * Requests permission for notifications and saves the token to Firestore.
@@ -19,31 +37,35 @@ export async function requestNotificationPermission(uid: string, firestore: Fire
 
   const supported = await isSupported();
   if (!supported) {
-    console.log("Firebase Messaging is not supported in this browser.");
+    console.log("FCM: Push notifications are not supported in this browser.");
     return;
   }
 
   try {
+    const { getMessaging, getToken } = await import('firebase/messaging');
+    const app = getApp();
+    
     // Explicitly register the service worker to help iOS/PWA environments find it
     if ('serviceWorker' in navigator) {
-      console.log('Registering service worker for messaging...');
+      console.log('FCM: Registering service worker...');
       await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
         scope: '/'
       });
-      console.log('Service worker for messaging registered successfully.');
+      // Wait for it to be ready
+      await navigator.serviceWorker.ready;
     }
 
-    console.log('Requesting notification permission...');
+    console.log('FCM: Requesting notification permission...');
     const permission = await Notification.requestPermission();
   
     if (permission === 'granted') {
-      console.log('Notification permission granted.');
+      console.log('FCM: Notification permission granted.');
       await saveMessagingDeviceToken(uid, firestore);
     } else {
-      console.log('Unable to get permission to notify.');
+      console.log('FCM: Unable to get permission to notify.');
     }
   } catch (err) {
-    console.error('Error during notification permission request:', err);
+    console.error('FCM: Error during notification permission request:', err);
   }
 }
 
@@ -55,11 +77,13 @@ export async function requestNotificationPermission(uid: string, firestore: Fire
 async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
   try {
     if (!VAPID_KEY || VAPID_KEY.includes('YOUR_VAPID_KEY_HERE')) {
-        console.warn("VAPID key is incomplete or missing in .env. Push notifications will not work until NEXT_PUBLIC_FIREBASE_VAPID_KEY is set correctly.");
+        console.warn("FCM: VAPID key is incomplete or missing in .env.");
         return;
     }
+
+    const { getMessaging, getToken } = await import('firebase/messaging');
     const messaging = getMessaging(getApp());
-    console.log('Attempting to get FCM token with VAPID key...');
+    console.log('FCM: Attempting to get FCM token...');
     
     // Explicitly get the registration to pass to getToken
     const registration = await navigator.serviceWorker.ready;
@@ -69,34 +93,32 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
     });
     
     if (fcmToken) {
-      console.log('FCM Token retrieved successfully:', fcmToken);
+      console.log('FCM: Token retrieved successfully.');
       const userDocRef = doc(firestore, 'users', uid);
       
       const userDoc = await getDoc(userDocRef);
       const existingTokens = userDoc.exists() ? userDoc.data()?.fcmTokens || [] : [];
 
       if (!existingTokens.includes(fcmToken)) {
-        console.log('Saving new FCM token to Firestore for user:', uid);
+        console.log('FCM: Saving new token to Firestore...');
         await setDoc(userDocRef, {
           fcmTokens: arrayUnion(fcmToken)
         }, { merge: true });
-        console.log('FCM token registration complete.');
+        console.log('FCM: Token registration complete.');
       } else {
-        console.log('FCM token already registered in Firestore.');
+        console.log('FCM: Token already registered.');
       }
     } else {
-      console.error('No FCM token received. This usually means the browser blocked notifications OR the VAPID key is invalid/unauthorized.');
+      console.error('FCM: No token received.');
     }
   } catch (error) {
-    console.error('Firebase Messaging Error:', error);
+    console.error('FCM Error:', error);
     if (error instanceof FirebaseError) {
         if (error.code === 'messaging/token-subscribe-failed') {
             console.error(
-                'Token subscription failed. Please ensure the FCM API is enabled in Google Cloud Console:\n' +
+                'FCM: Token subscription failed. Enable FCM API:\n' +
                 `https://console.cloud.google.com/apis/library/fcm.googleapis.com?project=${firebaseConfig.projectId}`
             );
-        } else if (error.code === 'messaging/permissions-blocked') {
-            console.error('Notification permissions were blocked by the user or the browser.');
         }
     }
   }
