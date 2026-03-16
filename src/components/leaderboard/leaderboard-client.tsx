@@ -82,9 +82,24 @@ export function LeaderboardClient() {
     return query(collection(firestore, 'users'), orderBy('total_points', 'desc'));
   }, [firestore]);
   
-  const { data: players, isLoading: playersLoading } = useCollection<WithId<UserProfile>>(playersQuery);
+  const seasonsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'seasons'), orderBy('startDate', 'desc'));
+  }, [firestore]);
   
-  const isLoading = playersLoading;
+  const { data: players, isLoading: playersLoading } = useCollection<WithId<UserProfile>>(playersQuery);
+  const { data: seasons, isLoading: seasonsLoading } = useCollection<WithId<Season>>(seasonsQuery);
+  
+  const activeSeason = useMemo(() => {
+    return seasons?.find(s => s.isActive);
+  }, [seasons]);
+
+  const leaderboardTitle = useMemo(() => {
+    if (activeTab === 'archive') return 'Archive';
+    return activeSeason?.name || 'Reguler Match';
+  }, [activeTab, activeSeason]);
+  
+  const isLoading = playersLoading || seasonsLoading;
   
   // --- Data Memoization ---
   const filteredPlayers = useMemo(() => {
@@ -236,7 +251,7 @@ export function LeaderboardClient() {
                         activeTab === 'overall' ? "bg-white text-emerald-800 shadow-sm" : "text-emerald-800/40 hover:text-emerald-800/60"
                     )}
                 >
-                    Reguler Match
+                    {activeSeason?.name || 'Reguler Match'}
                 </button>
                 <button 
                     onClick={() => setActiveTab('archive')}
@@ -264,7 +279,7 @@ export function LeaderboardClient() {
                 {/* List Section */}
                 <div className="mt-10 bg-white rounded-t-[3rem] px-6 pt-10 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.05)] ring-1 ring-emerald-900/5">
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-2xl font-black text-emerald-950">Reguler Match</h2>
+                        <h2 className="text-2xl font-black text-emerald-950 px-2">{leaderboardTitle}</h2>
                     </div>
                     
                     <div className="space-y-2 pb-10">
@@ -322,15 +337,6 @@ export function LeaderboardClient() {
                                 )}
                             </div>
                         )}
-                    </div>
-                    
-                    {/* Sponsor Logos */}
-                    <div className="mt-8 pt-8 pb-12 border-t border-emerald-900/5">
-                        <div className="flex flex-wrap items-center justify-center gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                            <img src="https://firebasestorage.googleapis.com/v0/b/padel-hore.firebasestorage.app/o/logo-gadyshine.png?alt=media" alt="Gadyshine" className="h-6" />
-                            <img src="https://firebasestorage.googleapis.com/v0/b/padel-hore.firebasestorage.app/o/logo-overstate.png?alt=media" alt="Overstate" className="h-4" />
-                            <img src="https://firebasestorage.googleapis.com/v0/b/padel-hore.firebasestorage.app/o/logo-schoenlab.png?alt=media" alt="Schoenlab" className="h-6" />
-                        </div>
                     </div>
                 </div>
             </>
