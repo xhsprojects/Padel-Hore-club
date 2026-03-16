@@ -125,14 +125,23 @@ export default function AdminNotificationsPage() {
 
             // Send push notifications
             if (fcmTokens.length > 0) {
-                await sendPushNotification(fcmTokens, {
+                const pushResult = await sendPushNotification(fcmTokens, {
                     title: data.title,
                     body: data.body,
                     link: data.link || undefined,
                 });
+
+                if (pushResult.success) {
+                    toast({ 
+                        title: 'Push Sent', 
+                        description: `Success: ${pushResult.successCount}, Failure: ${pushResult.failureCount}${pushResult.errors && pushResult.errors.length > 0 ? '\nErrors: ' + pushResult.errors.join(', ') : ''}` 
+                    });
+                } else {
+                    toast({ variant: 'destructive', title: 'Push Failed', description: pushResult.error });
+                }
             }
 
-            toast({ title: 'Success!', description: `Notification sent to ${count} users.` });
+            toast({ title: 'Success!', description: `In-app notifications sent to ${count} users.` });
             form.reset();
 
         } catch (err) {

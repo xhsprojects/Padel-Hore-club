@@ -72,15 +72,23 @@ export async function sendPushNotification(tokens: string[], payload: Notificati
     const response = await messaging.sendEachForMulticast({ tokens, ...message });
     
     console.log(`Successfully sent ${response.successCount} push notifications.`);
+    const errorDetails: string[] = [];
     if (response.failureCount > 0) {
       console.error(`Failed to send ${response.failureCount} push notifications.`);
-      response.responses.forEach(resp => {
+      response.responses.forEach((resp, idx) => {
         if (!resp.success) {
-          console.error(`- Token failed with error: ${resp.error}`);
+          const errMsg = `Token ${idx}: ${resp.error?.message || 'Unknown error'}`;
+          console.error(`- ${errMsg}`);
+          errorDetails.push(errMsg);
         }
       });
     }
-    return { success: true, successCount: response.successCount, failureCount: response.failureCount };
+    return { 
+      success: true, 
+      successCount: response.successCount, 
+      failureCount: response.failureCount,
+      errors: errorDetails
+    };
   } catch (error) {
     console.error('Error sending push notification:', error);
     return { success: false, error: (error as Error).message };
