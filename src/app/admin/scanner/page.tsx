@@ -16,7 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const DEFAULT_ADMIN_UID = "sWO5cXkN9CcuwyhLTG3gfUmY0HH2";
 
-export default function ScannerPage() {
+function ScannerPageContent() {
     const { user, isUserLoading } = useUser();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -129,33 +129,7 @@ export default function ScannerPage() {
     };
 
     if (isUserLoading || isProfileLoading || allPlayersLoading || !user) {
-        return (
-            <SidebarInset>
-                <div className="p-4 sm:p-6 lg:p-8">
-                     <Card className="max-w-4xl mx-auto">
-                        <CardHeader>
-                            <Skeleton className="h-8 w-3/4" />
-                            <Skeleton className="h-4 w-1/2" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid md:grid-cols-2 gap-8 items-start">
-                                <Skeleton className="w-full aspect-square rounded-lg" />
-                                <div className="space-y-4">
-                                     <Skeleton className="h-7 w-48" />
-                                     <div className="grid grid-cols-2 gap-4">
-                                        <Skeleton className="aspect-square" />
-                                        <Skeleton className="aspect-square" />
-                                        <Skeleton className="aspect-square" />
-                                        <Skeleton className="aspect-square" />
-                                     </div>
-                                     <Skeleton className="h-10 w-full" />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </SidebarInset>
-        );
+        return <ScannerSkeleton />;
     }
 
     const isDefaultAdmin = user.uid === DEFAULT_ADMIN_UID;
@@ -258,3 +232,44 @@ export default function ScannerPage() {
         </SidebarInset>
     );
 }
+
+function ScannerSkeleton() {
+    return (
+        <SidebarInset>
+            <div className="p-4 sm:p-6 lg:p-8">
+                 <Card className="max-w-4xl mx-auto">
+                    <CardHeader>
+                        <Skeleton className="h-8 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid md:grid-cols-2 gap-8 items-start">
+                            <Skeleton className="w-full aspect-square rounded-lg" />
+                            <div className="space-y-4">
+                                 <Skeleton className="h-7 w-48" />
+                                 <div className="grid grid-cols-2 gap-4">
+                                    <Skeleton className="aspect-square" />
+                                    <Skeleton className="aspect-square" />
+                                    <Skeleton className="aspect-square" />
+                                    <Skeleton className="aspect-square" />
+                                 </div>
+                                 <Skeleton className="h-10 w-full" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </SidebarInset>
+    );
+}
+
+import React, { Suspense } from 'react';
+
+export default function ScannerPage() {
+    return (
+        <Suspense fallback={<ScannerSkeleton />}>
+            <ScannerPageContent />
+        </Suspense>
+    );
+}
+
