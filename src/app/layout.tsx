@@ -15,6 +15,11 @@ export const metadata: Metadata = {
   title: 'Padel Hore Club',
   description: 'Leaderboard for the Padel Hore community.',
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Padel Hore',
+  },
   icons: {
     icon: '/logopadel.png',
     shortcut: '/logopadel.png',

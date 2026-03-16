@@ -95,6 +95,8 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
     
     if (fcmToken) {
       console.log('FCM: Token retrieved successfully.');
+      // Special log for debugging
+      console.log(`DEBUG_FCM_TOKEN: ${fcmToken}`);
       const userDocRef = doc(firestore, 'users', uid);
       
       const userDoc = await getDoc(userDocRef);

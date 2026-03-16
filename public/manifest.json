@@ -4,8 +4,9 @@
   "description": "Leaderboard and social platform for the Padel Hore Club community.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#0F172A",
+  "orientation": "portrait",
+  "background_color": "#f0f9f4",
+  "theme_color": "#10b981",
   "icons": [
     {
       "src": "/logopadel.png",
