@@ -26,6 +26,7 @@ export function NotificationDiagnostics({ userId, firestore }: { userId: string,
     const [diagnostics, setDiagnostics] = useState<DiagnosticState | null>(null);
     const [loading, setLoading] = useState(false);
     const [logs, setLogs] = useState<string[]>([]);
+    const { getDoc: firebaseGetDoc, doc: firebaseDoc } = useFirebase();
 
     const addLog = (msg: string) => {
         setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 15)]);
@@ -56,6 +57,7 @@ export function NotificationDiagnostics({ userId, firestore }: { userId: string,
             state.swStatus = registrations.length > 0 ? `${registrations.length} registered` : 'none';
             
             if (firestore && userId) {
+                // Use imported getDoc/doc directly as they are more reliable here
                 const userDoc = await getDoc(doc(firestore, 'users', userId));
                 if (userDoc.exists()) {
                     state.firestoreTokenCount = userDoc.data()?.fcmTokens?.length || 0;
