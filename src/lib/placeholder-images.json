@@ -1,0 +1,52 @@
+{
+  "placeholderImages": [
+    {
+      "id": "avatar-1",
+      "description": "Avatar for Budi Santoso",
+      "imageUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtYWxlJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzcwNDE3NDEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "male portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Avatar for Citra Lestari",
+      "imageUrl": "https://images.unsplash.com/photo-1614204424926-196a80bf0be8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxmZW1hbGUlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzAzMjE1Nzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "female portrait"
+    },
+    {
+      "id": "avatar-3",
+      "description": "Avatar for Eka Wijaya",
+      "imageUrl": "https://images.unsplash.com/photo-1566753323558-f4e0952af115?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxtYWxlJTIwcHJvZmlsZXxlbnwwfHx8fDE3NzA0MzcyODd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "male profile"
+    },
+    {
+      "id": "avatar-4",
+      "description": "Avatar for Dewi Anggraini",
+      "imageUrl": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxmZW1hbGUlMjBwcm9maWxlfGVufDB8fHx8MTc3MDQzNzI4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "female profile"
+    },
+    {
+      "id": "avatar-5",
+      "description": "Avatar for Adi Nugroho",
+      "imageUrl": "https://images.unsplash.com/photo-1556802907-d0a60bb3573e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtYW4lMjBwbGF5aW5nfGVufDB8fHx8MTc3MDM2NjU2Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man playing"
+    },
+    {
+      "id": "avatar-6",
+      "description": "Avatar for Fitriani",
+      "imageUrl": "https://images.unsplash.com/photo-1580643668142-265d03d70da2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx3b21hbiUyMHBsYXlpbmd8ZW58MHx8fHwxNzcwNDM3Mjg3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman playing"
+    },
+    {
+      "id": "avatar-7",
+      "description": "Avatar for Gilang Ramadhan",
+      "imageUrl": "https://images.unsplash.com/photo-1623184663110-89ba5b565eb6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYW4lMjBzbWlsaW5nfGVufDB8fHx8MTc3MDM1NTU2OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man smiling"
+    },
+    {
+      "id": "avatar-8",
+      "description": "Avatar for Hana Yuliana",
+      "imageUrl": "https://images.unsplash.com/photo-1525134479668-1bee5c7c6845?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3b21hbiUyMHNtaWxpbmd8ZW58MHx8fHwxNzcwNDA5MTY4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman smiling"
+    }
+  ]
+}

@@ -1,0 +1,726 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User Profile",
+      "type": "object",
+      "description": "Represents a user's profile in the Padel Hore.",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID from Firebase Authentication."
+        },
+        "phId": {
+          "type": "string",
+          "description": "The user's unique Padel Hore ID (e.g., PH-XXXX)."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address."
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the user."
+        },
+        "whatsapp": {
+          "type": "string",
+          "description": "The user's WhatsApp number."
+        },
+        "showWhatsapp": {
+          "type": "boolean",
+          "description": "Whether to show the user's WhatsApp number on their public profile."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user.",
+          "enum": ["admin", "member", "non-member", "guest"]
+        },
+        "total_points": {
+          "type": "number",
+          "description": "The total accumulated points of the user."
+        },
+        "tier": {
+          "type": "string",
+          "description": "The user's tier status (beginner, lower bronze, bronze, silver, gold)."
+        },
+        "win_count": {
+          "type": "number",
+          "description": "The number of matches won by the user."
+        },
+        "match_count": {
+          "type": "number",
+          "description": "The total number of matches played by the user."
+        },
+         "photoURL": {
+          "type": "string",
+          "description": "The URL for the user's custom avatar image.",
+          "format": "uri"
+        },
+        "fcmTokens": {
+            "type": "array",
+            "description": "An array of Firebase Cloud Messaging tokens for push notifications.",
+            "items": { "type": "string" }
+        },
+        "win_streak": {
+            "type": "number",
+            "description": "The user's current win streak."
+        },
+        "fair_play_count": {
+            "type": "number",
+            "description": "The number of times the user has been awarded for fair play."
+        },
+        "early_bird_count": {
+            "type": "number",
+            "description": "The number of matches the user has played in the morning."
+        },
+        "night_owl_count": {
+            "type": "number",
+            "description": "The number of matches the user has played at night."
+        },
+        "eventAttendanceCount": {
+          "type": "number",
+          "description": "The number of events the user has attended."
+        },
+        "skillLevel": {
+          "type": "number",
+          "description": "A manually assigned skill level for the player (1.0-5.0)."
+        },
+        "membershipExpiryDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date when the user's membership expires."
+        },
+        "isUnlimitedMember": {
+            "type": "boolean",
+            "description": "Grants the user lifetime membership, bypassing the expiry date."
+        },
+        "badges": {
+          "type": "array",
+          "description": "A list of badges earned by the user.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "badgeId": {
+                "type": "string",
+                "description": "The unique ID of the earned badge."
+              },
+              "timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When the badge was awarded."
+              }
+            },
+            "required": ["badgeId", "timestamp"]
+          }
+        }
+      },
+      "required": [
+        "uid",
+        "name",
+        "role",
+        "total_points",
+        "tier",
+        "win_count",
+        "match_count"
+      ]
+    },
+    "Match": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Match",
+      "type": "object",
+      "description": "Represents a match between two teams of players.",
+      "properties": {
+        "timestamp": {
+          "type": "object",
+          "description": "The date and time of the match (Firestore timestamp)."
+        },
+        "team_1": {
+          "type": "array",
+          "description": "An array containing the user UIDs of the players in team 1.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "team_2": {
+          "type": "array",
+          "description": "An array containing the user UIDs of the players in team 2.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "player_ids": {
+            "type": "array",
+            "description": "An array containing all user UIDs for easier querying.",
+            "items": {
+                "type": "string"
+            }
+        },
+        "score_1": {
+          "type": "number",
+          "description": "The score of team 1."
+        },
+        "score_2": {
+          "type": "number",
+          "description": "The score of team 2."
+        },
+        "winner_team": {
+          "type": "string",
+          "description": "Indicates which team won the match (Team 1 or Team 2)."
+        },
+        "margin": {
+          "type": "number",
+          "description": "The score difference between the winning and losing teams."
+        },
+        "host_id": {
+            "type": "string",
+            "description": "The ID of the player who hosted the match."
+        },
+        "on_time_players": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of player IDs who were on time for the match."
+        },
+        "fair_play_players": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Array of player IDs who demonstrated fair play."
+        },
+        "slot_filler_players": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Array of player IDs who were slot fillers for the match."
+        },
+        "point_breakdown": {
+          "type": "object",
+          "description": "An object detailing the points awarded to each player for the match."
+        },
+        "courtId": {
+          "type": "string",
+          "description": "The ID of the court where the match was played."
+        },
+        "courtName": {
+          "type": "string",
+          "description": "The name of the court where the match was played."
+        },
+        "courtLocation": {
+          "type": "string",
+          "description": "The location of the court where the match was played."
+        },
+        "eventId": {
+          "type": "string",
+          "description": "The ID of the event this match is part of."
+        },
+        "eventName": {
+          "type": "string",
+          "description": "The name of the event this match is part of."
+        },
+        "roundNumber": {
+          "type": "number",
+          "description": "The round number this match belongs to within an event."
+        }
+      },
+      "required": [
+        "timestamp",
+        "team_1",
+        "team_2",
+        "player_ids",
+        "score_1",
+        "score_2",
+        "winner_team",
+        "margin"
+      ]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Represents a notification for a user.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The ID of the user this notification is for."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the notification."
+        },
+        "body": {
+          "type": "string",
+          "description": "The optional body content of the notification."
+        },
+        "timestamp": {
+          "type": "object",
+          "description": "Firestore timestamp of when the notification was created."
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "Whether the user has read the notification."
+        },
+        "link": {
+          "type": "string",
+          "description": "An optional link to navigate to when the notification is clicked."
+        },
+        "linkButtonText": {
+          "type": "string",
+          "description": "The optional custom text for the notification's action button."
+        }
+      },
+      "required": [
+        "uid",
+        "title",
+        "timestamp",
+        "isRead"
+      ]
+    },
+    "Court": {
+      "title": "Court",
+      "description": "Represents a padel court.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the court."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location or address of the court."
+        }
+      },
+      "required": [
+        "name",
+        "location"
+      ]
+    },
+    "Season": {
+      "title": "Season",
+      "description": "Represents a competitive season.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the season."
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The start date of the season."
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The end date of the season."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicates if this is the currently active season."
+        }
+      },
+      "required": ["name", "startDate", "endDate", "isActive"]
+    },
+    "TierThresholds": {
+      "title": "Tier Thresholds",
+      "description": "Defines the minimum and maximum points for each player tier.",
+      "type": "object",
+      "properties": {
+        "beginner": {
+          "type": "object",
+          "properties": { "min": { "type": "number" }, "max": { "type": "number" } }
+        },
+        "lower bronze": {
+          "type": "object",
+          "properties": { "min": { "type": "number" }, "max": { "type": "number" } }
+        },
+        "bronze": {
+          "type": "object",
+          "properties": { "min": { "type": "number" }, "max": { "type": "number" } }
+        },
+        "silver": {
+          "type": "object",
+          "properties": { "min": { "type": "number" }, "max": { "type": "number" } }
+        },
+        "gold": {
+          "type": "object",
+          "properties": { "min": { "type": "number" }, "max": { "type": "number" } }
+        }
+      }
+    },
+    "AppSettings": {
+      "title": "App Settings",
+      "description": "Stores global application settings like maintenance mode and contact numbers.",
+      "type": "object",
+      "properties": {
+        "isMaintenanceMode": {
+          "type": "boolean",
+          "description": "If true, the app will be in maintenance mode for non-admins."
+        },
+        "maintenanceMessage": {
+          "type": "string",
+          "description": "The message to display to users during maintenance mode."
+        },
+        "membershipWhatsappNumber": {
+          "type": "string",
+          "description": "The WhatsApp number for membership admin."
+        },
+        "shopWhatsappNumber": {
+          "type": "string",
+          "description": "The WhatsApp number for shop admin."
+        }
+      }
+    },
+    "Event": {
+      "title": "Event",
+      "description": "Represents a club event like a tournament, social gathering, or coaching clinic.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the event."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the event."
+        },
+        "type": {
+          "type": "string",
+          "description": "The category of the event.",
+          "enum": ["Regular Match", "Versus", "Competition", "coaching-clinic", "social-gathering"]
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the event.",
+          "enum": ["upcoming", "ongoing", "completed", "cancelled"]
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The start date and time of the event."
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The end date and time of the event."
+        },
+        "maxParticipants": {
+          "type": "number",
+          "description": "The maximum number of participants allowed."
+        },
+        "participantIds": {
+          "type": "array",
+          "description": "An array of user UIDs who are confirmed participants.",
+          "items": { "type": "string" }
+        },
+        "waitlistIds": {
+          "type": "array",
+          "description": "An array of user UIDs on the waiting list.",
+          "items": { "type": "string" }
+        },
+        "attendancePoints": {
+          "type": "number",
+          "description": "Bonus points awarded for attending the event."
+        },
+        "pointMultiplier": {
+          "type": "number",
+          "description": "Multiplier for points earned in matches within this event (e.g., 1.5, 2)."
+        },
+        "bannerUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for the event's banner image."
+        },
+        "galleryUrls": {
+          "type": "array",
+          "description": "An array of URLs for images in the event gallery.",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "courtId": {
+            "type": "string",
+            "description": "The ID of the court where the event is held."
+        },
+        "rounds": {
+          "type": "array",
+          "description": "Defines the structure of rounds within the event.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "roundNumber": {
+                "type": "number",
+                "description": "The number of the round."
+              },
+              "byePlayerIds": {
+                "type": "array",
+                "description": "Array of user UIDs who have a bye in this round.",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": ["roundNumber"]
+          }
+        }
+      },
+      "required": ["name", "type", "status", "startDate", "endDate", "maxParticipants"]
+    },
+    "EventRegistration": {
+      "title": "Event Registration",
+      "description": "Represents a user's registration for a specific event.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the registered user."
+        },
+        "userName": {
+          "type": "string",
+          "description": "The name of the registered user."
+        },
+        "userPhotoUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "The photo URL of the registered user."
+        },
+        "registrationTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the user registered."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["confirmed", "waitlisted", "cancelled"],
+          "description": "The user's registration status."
+        },
+        "attended": {
+          "type": "boolean",
+          "description": "Whether the user has checked in and attended the event."
+        },
+        "checkInTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp of when the user checked in."
+        }
+      },
+      "required": ["userId", "userName", "registrationTimestamp", "status"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Represents a product in the club shop.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the product." },
+        "description": { "type": "string", "description": "A detailed description of the product." },
+        "price": { "type": "number", "description": "The price of the product in IDR." },
+        "imageUrls": {
+          "type": "array",
+          "description": "URLs for product images.",
+          "items": { "type": "string", "format": "uri" }
+        },
+        "status": { "type": "string", "enum": ["ready-stock", "pre-order", "out-of-stock"], "description": "The stock status of the product." },
+        "poEstimate": { "type": "string", "description": "Estimated delivery time for pre-order items (e.g., '2-3 weeks')." },
+        "variations": {
+          "type": "array",
+          "description": "Defines product variations like size or color.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string", "description": "Name of the variation (e.g., 'Size', 'Color')." },
+              "options": { "type": "array", "items": { "type": "string" }, "description": "Available options for this variation (e.g., ['S', 'M', 'L'])." }
+            },
+            "required": ["name", "options"]
+          }
+        }
+      },
+      "required": ["name", "description", "price", "status"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Represents a customer's order for a product.",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "description": "A unique ID for the order." },
+        "userId": { "type": "string", "description": "The ID of the user who placed the order." },
+        "userName": { "type": "string", "description": "The name of the user who placed the order." },
+        "productId": { "type": "string", "description": "The ID of the ordered product." },
+        "productName": { "type": "string", "description": "The name of the ordered product." },
+        "productImage": { "type": "string", "format": "uri", "description": "The image URL of the ordered product." },
+        "priceAtOrder": { "type": "number", "description": "The price of a single item at the time of order." },
+        "quantity": { "type": "number", "description": "The number of items ordered." },
+        "totalPrice": { "type": "number", "description": "The total price for the order." },
+        "selectedVariation": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "The selected variations for the product (e.g., {'Size': 'L', 'Color': 'Black'})."
+        },
+        "shippingAddress": { "type": "string", "description": "The shipping address or 'pickup'." },
+        "status": {
+          "type": "string",
+          "enum": ["pending-payment", "processing", "shipped", "completed", "cancelled"],
+          "description": "The current status of the order."
+        },
+        "orderTimestamp": { "type": "string", "format": "date-time", "description": "When the order was placed." },
+        "trackingNumber": { "type": "string", "description": "The shipping tracking number, if applicable." }
+      },
+      "required": ["orderId", "userId", "userName", "productId", "productName", "priceAtOrder", "quantity", "totalPrice", "status", "orderTimestamp"]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password"
+    ]
+  },
+  "firestore": {
+     "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile data, including points and roles. Publicly readable, but only the user or an admin can write.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (their UID)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/matches/{matchId}",
+        "definition": {
+          "entityName": "Match",
+          "schema": {
+            "$ref": "#/backend/entities/Match"
+          },
+          "description": "Stores match data. Publicly readable, but only admins can write.",
+          "params": [
+            {
+              "name": "matchId",
+              "description": "The unique identifier for the match (document ID)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "Stores notifications for a specific user. Only readable/writable by that user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The user's UID."
+            },
+            {
+              "name": "notificationId",
+              "description": "The notification's unique ID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/courts/{courtId}",
+        "definition": {
+          "entityName": "Court",
+          "schema": {
+            "$ref": "#/backend/entities/Court"
+          },
+          "description": "Stores information about available padel courts. Publicly readable, but only admins can write.",
+          "params": [
+            {
+              "name": "courtId",
+              "description": "The court's unique ID."
+            }
+          ]
+        }
+      },
+       {
+        "path": "/seasons/{seasonId}",
+        "definition": {
+          "entityName": "Season",
+          "schema": {
+            "$ref": "#/backend/entities/Season"
+          },
+          "description": "Stores competitive season data. Publicly readable, admin-only write.",
+          "params": [
+            {
+              "name": "seasonId",
+              "description": "The season's unique ID."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/settings/{settingId}",
+        "definition": {
+          "entityName": "TierThresholds",
+          "schema": {
+            "$ref": "#/backend/entities/TierThresholds"
+          },
+          "description": "Stores global application settings, like tier point thresholds. Publicly readable, admin-only write.",
+          "params": [
+            {
+              "name": "settingId",
+              "description": "The ID of the setting document (e.g., 'tier_thresholds')."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/settings/general",
+        "definition": {
+          "entityName": "AppSettings",
+          "schema": {
+            "$ref": "#/backend/entities/AppSettings"
+          },
+          "description": "Stores global application settings. Publicly readable, admin-only write."
+        }
+      },
+      {
+        "path": "/events/{eventId}",
+        "definition": {
+          "entityName": "Event",
+          "schema": { "$ref": "#/backend/entities/Event" },
+          "description": "Stores all club events. Publicly readable, admin-only write.",
+          "params": [{ "name": "eventId", "description": "The event's unique ID." }]
+        }
+      },
+      {
+        "path": "/events/{eventId}/registrations/{registrationId}",
+        "definition": {
+          "entityName": "EventRegistration",
+          "schema": { "$ref": "#/backend/entities/EventRegistration" },
+          "description": "Stores user registrations for an event. Authenticated users can read and create their own. Admins can manage all.",
+          "params": [
+            { "name": "eventId", "description": "The parent event's ID." },
+            { "name": "registrationId", "description": "The registration document ID (often the user's UID)." }
+          ]
+        }
+      },
+      {
+        "path": "/products/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": { "$ref": "#/backend/entities/Product" },
+          "description": "Stores all club shop products. Publicly readable, admin-only write.",
+          "params": [{ "name": "productId", "description": "The product's unique ID." }]
+        }
+      },
+      {
+        "path": "/orders/{orderId}",
+        "definition": {
+          "entityName": "Order",
+          "schema": { "$ref": "#/backend/entities/Order" },
+          "description": "Stores customer orders. Users can read their own orders. Admins can read all.",
+          "params": [{ "name": "orderId", "description": "The order's unique ID." }]
+        }
+      }
+    ]
+  }
+}
+
+    

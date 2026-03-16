@@ -1,0 +1,117 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Utility Functions ---
+    // These functions are helpers to make rules more readable.
+
+    // Returns true if the user is signed in.
+    function isAuthed() {
+      return request.auth != null;
+    }
+
+    // Returns true if the user is the owner of a document.
+    function isOwner(userId) {
+      return isAuthed() && request.auth.uid == userId;
+    }
+
+    // Returns true if the user has the 'admin' role.
+    function isAdmin() {
+      // Check if the user is the hardcoded super admin OR
+      // if their role in the /users/{uid} document is 'admin'.
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      let isSuperAdmin = request.auth != null && request.auth.uid == 'sWO5cXkN9CcuwyhLTG3gfUmY0HH2';
+      let isRoleAdmin = userDoc != null && 'role' in userDoc.data && userDoc.data.role == 'admin';
+      return isSuperAdmin || isRoleAdmin;
+    }
+    
+    // --- Publicly Readable Collections ---
+    // These collections can be read by anyone, even without being logged in.
+    // This is necessary for public-facing pages like leaderboards and event lists.
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if isOwner(userId) || isAdmin();
+      // Users can only update a limited set of non-critical fields on their own profile.
+      // Admins have full update rights.
+      allow update: if isAdmin() || (
+        isOwner(userId) &&
+        // The following fields MUST NOT change in a user-initiated update
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'whatsapp', 'showWhatsapp', 'photoURL', 'fcmTokens'])
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /courts/{courtId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /seasons/{seasonId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    match /matches/{matchId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    // --- Event Collections ---
+    // Events are public to read, but have specific write rules.
+    
+    match /events/{eventId} {
+        allow read: if true;
+        // Admins can fully create/delete events.
+        allow create, delete: if isAdmin();
+        
+        // Admins can update any field.
+        // Authenticated users can ONLY update participant or waitlist arrays.
+        allow update: if isAdmin() || (
+            isAuthed() && 
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['participantIds', 'waitlistIds'])
+        );
+
+        // Registrations sub-collection rules.
+        match /registrations/{registrationId} {
+            allow read: if true;
+            // Admins can create registrations for others. Users can only create their own.
+            allow create: if isAdmin() || (isAuthed() && request.resource.data.userId == request.auth.uid);
+            // Admins can update/delete any registration. Users can only update/delete their own.
+            allow update, delete: if isAdmin() || (isAuthed() && resource.data.userId == request.auth.uid);
+        }
+    }
+    
+    // --- Shop & Order Collections ---
+    match /products/{productId} {
+        allow read: if true;
+        allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+        // Users can only get their own orders. Admins can read any order.
+        allow read: if (isAuthed() && resource.data.userId == request.auth.uid) || isAdmin();
+        
+        // Users can only create orders for themselves.
+        allow create: if isOwner(request.resource.data.userId);
+        
+        // Only admins can update status or delete orders.
+        allow update, delete: if isAdmin();
+    }
+
+    // --- Private User Data ---
+    // Data that is private to each user.
+
+    match /users/{userId}/notifications/{notificationId} {
+      allow read, update, delete: if isOwner(userId);
+      // Admins can create notifications for any user.
+      allow create: if isAdmin();
+    }
+  }
+}
