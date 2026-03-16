@@ -81,6 +81,7 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
         return;
     }
 
+    console.log(`FCM: Using VAPID key: ${VAPID_KEY.substring(0, 5)}...`);
     const { getMessaging, getToken } = await import('firebase/messaging');
     const messaging = getMessaging(getApp());
     console.log('FCM: Attempting to get FCM token...');
