@@ -6,7 +6,6 @@ import { Message } from 'firebase-admin/messaging';
 
 // Helper to initialize the admin app safely
 function getAdminApp() {
-  // Check if the app is already initialized to prevent errors in hot-reload environments
   if (admin.apps.length > 0) {
     return admin.apps[0] as admin.app.App;
   }
@@ -15,24 +14,27 @@ function getAdminApp() {
 
   if (serviceAccountKey) {
     try {
-      const serviceAccount = JSON.parse(serviceAccountKey);
-      // A basic check to see if the parsed object looks like a service account.
-      if (serviceAccount.project_id && serviceAccount.private_key) {
+      // Normal parse
+      let parsed = JSON.parse(serviceAccountKey);
+      
+      // If result is still a string (double-encoded), parse again
+      if (typeof parsed === 'string') {
+        parsed = JSON.parse(parsed);
+      }
+
+      if (parsed.project_id && parsed.private_key) {
+        console.log("FCM: Initializing with Service Account for project:", parsed.project_id);
         return admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
+          credential: admin.credential.cert(parsed),
+          projectId: parsed.project_id
         });
       }
     } catch (e) {
-      // If parsing fails, log a warning and fall through to the default initialization.
-      console.warn(
-        "FIREBASE_SERVICE_ACCOUNT_KEY is set but is not valid JSON. Falling back to Application Default Credentials."
-      );
+      console.warn("FCM: FIREBASE_SERVICE_ACCOUNT_KEY parse failed:", (e as Error).message);
     }
   }
 
-  // This will use Application Default Credentials.
-  // It works automatically in Google Cloud environments (like App Hosting).
-  // For local development or other platforms, you might need to set up ADC.
+  console.warn("FCM: Falling back to Application Default Credentials.");
   return admin.initializeApp();
 }
 
