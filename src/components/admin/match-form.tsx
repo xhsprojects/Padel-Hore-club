@@ -1009,7 +1009,7 @@ const BonusCheckboxes = ({ form, players, fieldName, label, icon: Icon }: { form
                                                 onCheckedChange={(checked) => {
                                                     return checked
                                                         ? field.onChange([...(field.value || []), player.id])
-                                                        : field.onChange(field.value?.filter((value) => value !== player.id));
+                                                        : field.onChange(field.value?.filter((value: string) => value !== player.id));
                                                 }}
                                             />
                                         </FormControl>

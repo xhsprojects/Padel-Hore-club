@@ -194,7 +194,7 @@ export function SeasonManagement({ onEdit, onDelete }: SeasonManagementProps) {
             name: p.name || 'Unknown Player',
             phId: p.phId || `PH-${p.id.substring(0, 4).toUpperCase()}`,
             photoURL: p.photoURL || null,
-            tier: getTier(p.total_points, thresholds),
+            tier: getTier(p.total_points, thresholds as TierThresholds),
             total_points: p.total_points,
             win_count: p.win_count,
             match_count: p.match_count,
@@ -212,11 +212,11 @@ export function SeasonManagement({ onEdit, onDelete }: SeasonManagementProps) {
         if (player.role === 'admin') return;
 
         const pointsFromEndedSeason = playerStatsForEndedSeason[userDoc.id]?.points || 0;
-        const playerTier = getTier(player.total_points, thresholds);
-        const baseTierPoints = thresholds[playerTier]?.min ?? 0;
-        const retentionRate = getRetentionRate(playerTier, percentages);
+        const playerTier = getTier(player.total_points, thresholds as TierThresholds);
+        const baseTierPoints = (thresholds as TierThresholds)[playerTier]?.min ?? 0;
+        const retentionRate = getRetentionRate(playerTier, percentages as Record<Tier, number>);
         const newPoints = Math.round((pointsFromEndedSeason * retentionRate) + baseTierPoints);
-        const newTier = getTier(newPoints, thresholds);
+        const newTier = getTier(newPoints, thresholds as TierThresholds);
         
         const playerRef = doc(firestore, 'users', userDoc.id);
         batch.update(playerRef, {

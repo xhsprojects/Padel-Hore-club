@@ -25,11 +25,11 @@ const EliteIcon = `<g transform="translate(100, 90) scale(0.4)"><path d="M100,28
 const LegendIcon = `<g transform="translate(100, 90) scale(0.4)"><path d="M5,16L3,5L8.5,10L12,4L15.5,10L21,5L19,16H5M19,19H5V18H19V19Z" fill="white" transform="translate(-12, -12) scale(2.5)" opacity="0.8"/></g>`;
 
 const badgeData: Record<Tier, {colors: [string, string], icon: string}> = {
-    Rookie: { colors: ["#94a3b8", "#64748b"], icon: RookieIcon },
-    Regular: { colors: ["#38bdf8", "#0ea5e9"], icon: RegularIcon },
-    Challenger: { colors: ["#a78bfa", "#8b5cf6"], icon: ChallengerIcon },
-    Elite: { colors: ["#facc15", "#eab308"], icon: EliteIcon },
-    Legend: { colors: ["#f43f5e", "#e11d48"], icon: LegendIcon },
+    beginner: { colors: ["#94a3b8", "#64748b"], icon: RookieIcon },
+    "lower bronze": { colors: ["#38bdf8", "#0ea5e9"], icon: RegularIcon },
+    bronze: { colors: ["#a78bfa", "#8b5cf6"], icon: ChallengerIcon },
+    silver: { colors: ["#facc15", "#eab308"], icon: EliteIcon },
+    gold: { colors: ["#f43f5e", "#e11d48"], icon: LegendIcon },
 }
 
 export function getTierBadgeDataUri(tier: Tier): string {

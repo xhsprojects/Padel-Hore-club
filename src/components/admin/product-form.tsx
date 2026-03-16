@@ -121,7 +121,7 @@ export function ProductForm({ productToEdit }: ProductFormProps) {
         return uploadBytesResumable(newStorageRef, file).then(uploadTask => getDownloadURL(uploadTask.ref));
       });
 
-      const newImageUrls = await Promise.all(uploadPromises);
+      const newImageUrls: string[] = await Promise.all(uploadPromises);
       finalImageUrls = [...finalImageUrls, ...newImageUrls];
 
       const productData: Product = {
