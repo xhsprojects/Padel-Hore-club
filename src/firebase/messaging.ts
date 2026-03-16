@@ -33,17 +33,17 @@ export async function isSupported() {
  * @param firestore A Firestore instance.
  */
 export async function requestNotificationPermission(uid: string, firestore: Firestore) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return { success: false, error: 'Not in browser' };
 
   const supported = await isSupported();
   if (!supported) {
-    console.log("FCM: Push notifications are not supported in this browser.");
-    return;
+     const msg = "FCM: Push notifications are not supported in this browser.";
+     console.log(msg);
+     return { success: false, error: msg };
   }
 
   try {
-    const { getMessaging, getToken } = await import('firebase/messaging');
-    const app = getApp();
+    const { getMessaging } = await import('firebase/messaging');
     
     // Explicitly register the service worker to help iOS/PWA environments find it
     if ('serviceWorker' in navigator) {
@@ -60,12 +60,19 @@ export async function requestNotificationPermission(uid: string, firestore: Fire
   
     if (permission === 'granted') {
       console.log('FCM: Notification permission granted.');
-      await saveMessagingDeviceToken(uid, firestore);
+      const token = await saveMessagingDeviceToken(uid, firestore);
+      if (token) {
+          return { success: true, token };
+      }
+      return { success: false, error: 'Gagal mendapatkan token FCM' };
     } else {
       console.log('FCM: Unable to get permission to notify.');
+      return { success: false, error: 'Izin notifikasi ditolak' };
     }
   } catch (err) {
-    console.error('FCM: Error during notification permission request:', err);
+    const msg = `FCM: Error during notification permission request: ${err instanceof Error ? err.message : String(err)}`;
+    console.error(msg);
+    return { success: false, error: msg };
   }
 }
 
@@ -78,7 +85,7 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
   try {
     if (!VAPID_KEY || VAPID_KEY.includes('YOUR_VAPID_KEY_HERE')) {
         console.warn("FCM: VAPID key is incomplete or missing in .env.");
-        return;
+        return null;
     }
 
     console.log(`FCM: Using VAPID key: ${VAPID_KEY.substring(0, 5)}...`);
@@ -95,10 +102,9 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
     
     if (fcmToken) {
       console.log('FCM: Token retrieved successfully.');
-      // Special log for debugging
       console.log(`DEBUG_FCM_TOKEN: ${fcmToken}`);
-      const userDocRef = doc(firestore, 'users', uid);
       
+      const userDocRef = doc(firestore, 'users', uid);
       const userDoc = await getDoc(userDocRef);
       const existingTokens = userDoc.exists() ? userDoc.data()?.fcmTokens || [] : [];
 
@@ -111,8 +117,10 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
       } else {
         console.log('FCM: Token already registered.');
       }
+      return fcmToken;
     } else {
       console.error('FCM: No token received.');
+      return null;
     }
   } catch (error) {
     console.error('FCM Error:', error);
@@ -124,5 +132,6 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
             );
         }
     }
+    throw error;
   }
 }
