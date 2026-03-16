@@ -99,12 +99,14 @@ export default function AdminNotificationsPage() {
 
             usersSnapshot.forEach((userDoc) => {
                 const member = userDoc.data() as UserProfile;
-                if (member.uid === auth.currentUser?.uid) return;
+                const targetUid = userDoc.id; // Correct way to get the UID from document
+                
+                if (targetUid === auth.currentUser?.uid) return;
 
                 // Add in-app notification to batch
-                const notifRef = doc(collection(firestore, 'users', member.uid, 'notifications'));
+                const notifRef = doc(collection(firestore, 'users', targetUid, 'notifications'));
                 batch.set(notifRef, {
-                    uid: member.uid,
+                    uid: targetUid,
                     title: data.title,
                     body: data.body,
                     link: data.link || null,
@@ -115,7 +117,7 @@ export default function AdminNotificationsPage() {
                 });
 
                 // Collect FCM tokens for push notification
-                if (member.fcmTokens && member.fcmTokens.length > 0) {
+                if (member.fcmTokens && Array.isArray(member.fcmTokens)) {
                     fcmTokens.push(...member.fcmTokens);
                 }
                 count++;
