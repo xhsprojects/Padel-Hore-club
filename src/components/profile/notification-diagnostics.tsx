@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, XCircle, Info, RefreshCw, Bell, Terminal } from 'lucide-react';
 import { isSupported, requestNotificationPermission } from '@/firebase/messaging';
 import { useFirebase } from '@/firebase';
+import { getDoc, doc } from 'firebase/firestore';
 
 interface DiagnosticState {
     isSecure: boolean;
@@ -18,7 +19,6 @@ interface DiagnosticState {
     fcmSupported: boolean | null;
     swStatus: string;
     vapidKeyPreview: string;
-    currentToken: string | null;
     firestoreTokenCount: number;
 }
 
@@ -26,7 +26,6 @@ export function NotificationDiagnostics({ userId, firestore }: { userId: string,
     const [diagnostics, setDiagnostics] = useState<DiagnosticState | null>(null);
     const [loading, setLoading] = useState(false);
     const [logs, setLogs] = useState<string[]>([]);
-    const { getDoc, doc } = useFirebase();
 
     const addLog = (msg: string) => {
         setLogs(prev => [`[${new Date().toLocaleTimeString()}] ${msg}`, ...prev.slice(0, 15)]);
@@ -48,7 +47,6 @@ export function NotificationDiagnostics({ userId, firestore }: { userId: string,
             vapidKeyPreview: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY ? 
                 `${process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY.substring(0, 5)}...` : 
                 'MISSING',
-            currentToken: null,
             firestoreTokenCount: 0
         };
 
@@ -73,8 +71,10 @@ export function NotificationDiagnostics({ userId, firestore }: { userId: string,
     };
 
     useEffect(() => {
-        runDiagnostics();
-    }, []);
+        if (firestore && userId) {
+            runDiagnostics();
+        }
+    }, [firestore, userId]);
 
     const handleEnable = async () => {
         setLoading(true);
@@ -182,10 +182,6 @@ export function NotificationDiagnostics({ userId, firestore }: { userId: string,
                         ))}
                     </div>
                 )}
-            </CardContent>
-        </Card>
-    );
-}
             </CardContent>
         </Card>
     );
