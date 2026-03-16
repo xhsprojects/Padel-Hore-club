@@ -66,15 +66,19 @@ export default function AdminNotificationsPage() {
     }, [isUserLoading, user, router]);
 
     const handleSendNotification = async (data: NotificationFormValues) => {
+        console.log('AdminNotif: Start sending...', data);
         setIsSending(true);
         setError(null);
+        
         if (!firestore || !auth?.currentUser) {
+            console.error('AdminNotif: Firestore or Auth not available');
             setError('Firestore not available or user not authenticated');
             setIsSending(false);
             return;
         }
 
         try {
+            console.log('AdminNotif: Fetching users...');
             const usersCollectionRef = collection(firestore, 'users');
             let usersQuery;
 
@@ -86,6 +90,7 @@ export default function AdminNotificationsPage() {
             }
 
             const usersSnapshot = await getDocs(usersQuery);
+            console.log(`AdminNotif: Found ${usersSnapshot.size} users.`);
             
             if (usersSnapshot.empty) {
                 toast({ variant: 'destructive', title: 'No Users Found', description: `There are no users matching the target: ${data.target}` });
@@ -101,10 +106,13 @@ export default function AdminNotificationsPage() {
                 const member = userDoc.data() as UserProfile;
                 const targetUid = userDoc.id; 
                 
-                if (!targetUid || targetUid === auth.currentUser?.uid) return;
+                if (!targetUid || targetUid === auth.currentUser?.uid) {
+                    console.log(`AdminNotif: Skipping user ${targetUid} (is self or empty)`);
+                    return;
+                }
 
                 // Add in-app notification to batch
-                const notifRef = doc(firestore, 'users', targetUid, 'notifications', doc(collection(firestore, 'users', targetUid, 'notifications')).id);
+                const notifRef = doc(collection(firestore, 'users', targetUid, 'notifications'));
                 batch.set(notifRef, {
                     uid: targetUid,
                     title: data.title,
@@ -125,38 +133,52 @@ export default function AdminNotificationsPage() {
                 count++;
             });
 
+            console.log(`AdminNotif: Committing batch for ${count} users...`);
             await batch.commit();
+            console.log('AdminNotif: Batch committed.');
 
             let pushDetails = "No push tokens found.";
-            let success = true;
+            let pushSuccess = true;
 
             // Send push notifications
             if (fcmTokens.length > 0) {
-                const pushResult = await sendPushNotification(fcmTokens, {
-                    title: data.title,
-                    body: data.body,
-                    link: data.link || undefined,
-                });
+                console.log(`AdminNotif: Sending push notifications to ${fcmTokens.length} tokens...`);
+                try {
+                    const pushResult = await sendPushNotification(fcmTokens, {
+                        title: data.title,
+                        body: data.body,
+                        link: data.link || undefined,
+                    });
 
-                if (pushResult.success) {
-                    pushDetails = `Push Sent: ${pushResult.successCount} ok, ${pushResult.failureCount} failed.`;
-                } else {
-                    pushDetails = `Push Error: ${pushResult.error}`;
-                    success = false;
+                    if (pushResult.success) {
+                        console.log('AdminNotif: Push sent successfully.', pushResult);
+                        pushDetails = `Push Sent: ${pushResult.successCount} ok, ${pushResult.failureCount} failed.`;
+                    } else {
+                        console.error('AdminNotif: Push failed.', pushResult.error);
+                        pushDetails = `Push Error: ${pushResult.error}`;
+                        pushSuccess = false;
+                    }
+                } catch (pushErr) {
+                    console.error('AdminNotif: Critical error in push action:', pushErr);
+                    pushDetails = `Push API Error: ${pushErr instanceof Error ? pushErr.message : String(pushErr)}`;
+                    pushSuccess = false;
                 }
             }
 
+            console.log('AdminNotif: Showing final toast.');
             toast({ 
-                variant: success ? 'default' : 'destructive',
-                title: success ? 'Notifications Sent!' : 'Partial Success', 
+                variant: pushSuccess ? 'default' : 'destructive',
+                title: pushSuccess ? 'Notifications Sent!' : 'Partial Success', 
                 description: `In-app: ${count} users. ${pushDetails}` 
             });
             form.reset();
 
         } catch (err) {
-            console.error('Failed to send notifications:', err);
+            console.error('AdminNotif: Failed to send notifications:', err);
             setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+            toast({ variant: 'destructive', title: 'Error', description: err instanceof Error ? err.message : 'Failed to send' });
         } finally {
+            console.log('AdminNotif: Routine finished.');
             setIsSending(false);
         }
     };
