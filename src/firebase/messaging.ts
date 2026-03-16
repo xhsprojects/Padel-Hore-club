@@ -39,47 +39,43 @@ export async function requestNotificationPermission(uid: string, firestore: Fire
  */
 async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
   try {
-    if (!VAPID_KEY) {
-        console.warn("VAPID key is missing. Push notifications will not work. Please set NEXT_PUBLIC_FIREBASE_VAPID_KEY in your .env file.");
+    if (!VAPID_KEY || VAPID_KEY.includes('YOUR_VAPID_KEY_HERE')) {
+        console.warn("VAPID key is incomplete or missing in .env. Push notifications will not work until NEXT_PUBLIC_FIREBASE_VAPID_KEY is set correctly.");
         return;
     }
     const messaging = getMessaging(getApp());
+    console.log('Attempting to get FCM token...');
     const fcmToken = await getToken(messaging, { vapidKey: VAPID_KEY });
     
     if (fcmToken) {
-      console.log('FCM Token:', fcmToken);
+      console.log('FCM Token retrieved successfully:', fcmToken);
       const userDocRef = doc(firestore, 'users', uid);
       
       const userDoc = await getDoc(userDocRef);
-      // If the doc doesn't exist, existingTokens will be an empty array.
       const existingTokens = userDoc.exists() ? userDoc.data()?.fcmTokens || [] : [];
 
       if (!existingTokens.includes(fcmToken)) {
-        // Use set with merge to create the doc if it doesn't exist, or update it if it does.
-        // This is safer than updateDoc for users who might not have a profile doc yet (like a default admin).
         await setDoc(userDocRef, {
           fcmTokens: arrayUnion(fcmToken)
         }, { merge: true });
-        console.log('FCM token saved to Firestore.');
+        console.log('FCM token registered in Firestore for user:', uid);
       } else {
-        console.log('FCM token already exists for this user.');
+        console.log('FCM token already registered for this user.');
       }
     } else {
-      // This happens if the app is not in the foreground when permission is requested.
-      // We need to ask the user to grant permission again.
-      console.log('No registration token available. Request permission to generate one.');
-      await requestNotificationPermission(uid, firestore);
+      console.log('No FCM token received. This may happen if the browser blocks notifications or if the VAPID key is invalid.');
     }
   } catch (error) {
-    console.error('Unable to get messaging token.', error);
-    if (error instanceof FirebaseError && error.code === 'messaging/token-subscribe-failed') {
-        console.error(
-            '********************************************************************************\n' +
-            'This error usually means the Firebase Cloud Messaging API is not enabled for your project.\n' +
-            'Please visit the following URL to enable it:\n' +
-            `https://console.cloud.google.com/apis/library/fcm.googleapis.com?project=${firebaseConfig.projectId}\n` +
-            '********************************************************************************'
-        );
+    console.error('Firebase Messaging Error:', error);
+    if (error instanceof FirebaseError) {
+        if (error.code === 'messaging/token-subscribe-failed') {
+            console.error(
+                'Token subscription failed. Please ensure the FCM API is enabled in Google Cloud Console:\n' +
+                `https://console.cloud.google.com/apis/library/fcm.googleapis.com?project=${firebaseConfig.projectId}`
+            );
+        } else if (error.code === 'messaging/permissions-blocked') {
+            console.error('Notification permissions were blocked by the user or the browser.');
+        }
     }
   }
 }

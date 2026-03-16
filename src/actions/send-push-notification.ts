@@ -53,7 +53,7 @@ export async function sendPushNotification(tokens: string[], payload: Notificati
     const app = getAdminApp();
     const messaging = app.messaging();
 
-    const message: Message = {
+    const message = {
       notification: {
           title: payload.title,
           body: payload.body,
@@ -66,10 +66,9 @@ export async function sendPushNotification(tokens: string[], payload: Notificati
           link: payload.link || process.env.NEXT_PUBLIC_BASE_URL || '/',
         },
       },
-      // We send to a single token in the message. For multiple, we use sendEachForMulticast
-      token: '' 
     };
     
+    // @ts-ignore - MulticastMessage type is slightly different but compatible
     const response = await messaging.sendEachForMulticast({ tokens, ...message });
     
     console.log(`Successfully sent ${response.successCount} push notifications.`);
