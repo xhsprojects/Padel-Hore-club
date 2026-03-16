@@ -6,12 +6,12 @@ importScripts("https://www.gstatic.com/firebasejs/11.9.1/firebase-messaging-comp
 // You'll need to replace this with your project's configuration
 // Note: This is public-facing configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyByFhX0BfmWoywtJIkPvMEFOEebpf6Ip78",
-  authDomain: "studio-9868070855-4e715.firebaseapp.com",
-  projectId: "studio-9868070855-4e715",
-  storageBucket: "studio-9868070855-4e715.appspot.com",
-  messagingSenderId: "930516068429",
-  appId: "1:930516068429:web:7e35affd7c40ba98809404",
+  apiKey: "AIzaSyCQBTvIhHZjeLKYk_OE9pE9oxDrsW5hcf8",
+  authDomain: "padel-hore.firebaseapp.com",
+  projectId: "padel-hore",
+  storageBucket: "padel-hore.firebasestorage.app",
+  messagingSenderId: "577273193364",
+  appId: "1:577273193364:web:3728d1b9f68ef250b3e581",
 };
 
 firebase.initializeApp(firebaseConfig);
