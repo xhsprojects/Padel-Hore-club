@@ -3,7 +3,6 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';

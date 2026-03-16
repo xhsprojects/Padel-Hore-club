@@ -44,7 +44,7 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
         return;
     }
     const messaging = getMessaging(getApp());
-    console.log('Attempting to get FCM token...');
+    console.log('Attempting to get FCM token with VAPID key starting with:', VAPID_KEY.substring(0, 10) + '...');
     const fcmToken = await getToken(messaging, { vapidKey: VAPID_KEY });
     
     if (fcmToken) {
@@ -55,15 +55,16 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
       const existingTokens = userDoc.exists() ? userDoc.data()?.fcmTokens || [] : [];
 
       if (!existingTokens.includes(fcmToken)) {
+        console.log('Saving new FCM token to Firestore for user:', uid);
         await setDoc(userDocRef, {
           fcmTokens: arrayUnion(fcmToken)
         }, { merge: true });
-        console.log('FCM token registered in Firestore for user:', uid);
+        console.log('FCM token registration complete.');
       } else {
-        console.log('FCM token already registered for this user.');
+        console.log('FCM token already registered in Firestore.');
       }
     } else {
-      console.log('No FCM token received. This may happen if the browser blocks notifications or if the VAPID key is invalid.');
+      console.error('No FCM token received. This usually means the browser blocked notifications OR the VAPID key is invalid/unauthorized.');
     }
   } catch (error) {
     console.error('Firebase Messaging Error:', error);

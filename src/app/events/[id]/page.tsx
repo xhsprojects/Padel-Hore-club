@@ -3,9 +3,8 @@ import { useParams, notFound, useRouter } from 'next/navigation';
 import { useFirebase, useDoc, useCollection, useMemoFirebase, useUser } from '@/firebase';
 import { doc, collection, query, orderBy, where } from 'firebase/firestore';
 import type { Event, EventRegistration, WithId, Match, UserProfile, EventStatus, Round } from '@/lib/types';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, ArrowLeft, Users, Calendar, Clock, UserCheck, Hourglass, Swords, Camera, Trophy, UserX, MapPin, ShieldCheck, Crown, Star } from 'lucide-react';
+import { Loader2, ArrowLeft, Users, Calendar, Clock, UserCheck, Hourglass, Swords, Camera, Trophy, UserX, MapPin, ShieldCheck, Crown, Star, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { EventRegistrationManager } from '@/components/events/event-registration-manager';
@@ -92,12 +91,37 @@ export default function EventDetailPage() {
     }, [registrations]);
 
     const isLoading = eventLoading || registrationsLoading || matchesLoading || allPlayersLoading || isUserLoading;
-
     if (isLoading) {
         return (
-            <SidebarInset>
-                <div className="p-2 sm:p-6 lg:p-8"><div className="max-w-4xl mx-auto"><Skeleton className="h-10 w-36 mb-4" /><Card className="overflow-hidden"><Skeleton className="h-48 md:h-64 w-full" /><CardHeader><div className="flex justify-between"><Skeleton className="h-8 w-3/4" /><Skeleton className="h-6 w-24" /></div><div className="flex gap-x-6 pt-2"><Skeleton className="h-5 w-48" /><Skeleton className="h-5 w-32" /></div></CardHeader><CardContent className="grid md:grid-cols-3 gap-8"><div className="md:col-span-2 space-y-6"><Skeleton className="h-10 w-full" /><div className="mt-6 space-y-4"><Skeleton className="h-64 w-full" /></div></div><div className="md:col-span-1"><Skeleton className="h-48 w-full" /></div></CardContent></Card></div></div>
-            </SidebarInset>
+            <div className="p-2 sm:p-6 lg:p-8">
+                <div className="max-w-4xl mx-auto">
+                    <Skeleton className="h-10 w-36 mb-4" />
+                    <Card className="overflow-hidden">
+                        <Skeleton className="h-48 md:h-64 w-full" />
+                        <CardHeader>
+                            <div className="flex justify-between">
+                                <Skeleton className="h-8 w-3/4" />
+                                <Skeleton className="h-6 w-24" />
+                            </div>
+                            <div className="flex gap-x-6 pt-2">
+                                <Skeleton className="h-5 w-48" />
+                                <Skeleton className="h-5 w-32" />
+                            </div>
+                        </CardHeader>
+                        <CardContent className="grid md:grid-cols-3 gap-8">
+                            <div className="md:col-span-2 space-y-6">
+                                <Skeleton className="h-10 w-full" />
+                                <div className="mt-6 space-y-4">
+                                    <Skeleton className="h-64 w-full" />
+                                </div>
+                            </div>
+                            <div className="md:col-span-1">
+                                <Skeleton className="h-48 w-full" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         );
     }
     
@@ -108,9 +132,75 @@ export default function EventDetailPage() {
     const statusDetails = eventStatusDetails[status];
 
     return (
-         <SidebarInset>
-            <div className="p-2 sm:p-6 lg:p-8"><div className="max-w-4xl mx-auto"><Button variant="outline" onClick={() => router.back()} className="mb-4"><ArrowLeft className="mr-2 h-4 w-4" />Back to Events</Button><Card className="overflow-hidden">{event.bannerUrl && <div className="relative h-48 md:h-64 w-full"><Image src={event.bannerUrl} alt={event.name} fill className="object-cover" /></div>}<CardHeader><div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2"><CardTitle className="font-headline text-3xl">{event.name}</CardTitle><Badge className={cn("w-fit", statusDetails.className)}>{statusDetails.label}</Badge></div><div className="flex flex-col sm:flex-row sm:items-center gap-x-6 gap-y-2 text-muted-foreground pt-2"><div className="flex items-center gap-2"><Calendar className="h-4 w-4"/> {format(event.startDate.toDate(), "eeee, dd MMMM yyyy")}</div><div className="flex items-center gap-2"><Clock className="h-4 w-4"/> {format(event.startDate.toDate(), "p")} - {format(event.endDate.toDate(), "p")}</div></div></CardHeader><CardContent className="grid md:grid-cols-3 gap-8"><div className="md:col-span-2 space-y-6"><Tabs defaultValue="details" className="w-full"><TabsList className="grid w-full grid-cols-3"><TabsTrigger value="details">Details</TabsTrigger><TabsTrigger value="leaderboard">Leaderboard</TabsTrigger><TabsTrigger value="matches">Matches</TabsTrigger></TabsList><TabsContent value="details" className="mt-6"><div className="space-y-6"><div><h3 className="font-bold text-lg mb-2">Event Details</h3><p className="text-muted-foreground whitespace-pre-wrap">{event.description}</p></div><EventGallery urls={event.galleryUrls || []} /><ParticipantList title="Confirmed Participants" icon={UserCheck} participants={confirmedParticipants} max={event.maxParticipants} /><ParticipantList title="Waitlist" icon={Hourglass} participants={waitlistedParticipants} /></div></TabsContent><TabsContent value="leaderboard" className="mt-6"><EventLeaderboard leaderboard={eventLeaderboard} /></TabsContent><TabsContent value="matches" className="mt-6"><MatchList event={event} matches={matches || []} playersMap={playersMap} /></TabsContent></Tabs></div><div className="md:col-span-1"><Card className="bg-card/50 sticky top-20"><CardHeader><CardTitle className="text-xl">Registration</CardTitle></CardHeader><CardContent><div className="flex justify-between items-center text-sm font-bold"><span>Slots Filled</span><span>{confirmedParticipants.length} / {event.maxParticipants}</span></div><div className="w-full bg-muted rounded-full h-2.5 my-2"><div className="bg-primary h-2.5 rounded-full" style={{ width: `${(confirmedParticipants.length / event.maxParticipants) * 100}%` }}></div></div>{isFull && waitlistedParticipants.length > 0 && <p className="text-xs text-center text-muted-foreground">{waitlistedParticipants.length} on waitlist</p>}</CardContent><CardFooter><EventRegistrationManager event={event} registrations={registrations || []} /></CardFooter></Card></div></CardContent></Card></div></div>
-        </SidebarInset>
+        <div className="p-2 sm:p-6 lg:p-8">
+            <div className="max-w-4xl mx-auto">
+                <Button variant="outline" onClick={() => router.back()} className="mb-4">
+                    <ArrowLeft className="mr-2 h-4 w-4" />Back to Events
+                </Button>
+                <Card className="overflow-hidden">
+                    {/* ... content remains the same ... */}
+                    {event.bannerUrl && <div className="relative h-48 md:h-64 w-full"><Image src={event.bannerUrl} alt={event.name} fill className="object-cover" /></div>}
+                    <CardHeader>
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                            <CardTitle className="font-headline text-3xl">{event.name}</CardTitle>
+                            <Badge className={cn("w-fit", statusDetails.className)}>{statusDetails.label}</Badge>
+                        </div>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-x-6 gap-y-2 text-muted-foreground pt-2">
+                            <div className="flex items-center gap-2"><Calendar className="h-4 w-4"/> {format(event.startDate.toDate(), "eeee, dd MMMM yyyy")}</div>
+                            <div className="flex items-center gap-2"><Clock className="h-4 w-4"/> {format(event.startDate.toDate(), "p")} - {format(event.endDate.toDate(), "p")}</div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="grid md:grid-cols-3 gap-8">
+                        <div className="md:col-span-2 space-y-6">
+                            <Tabs defaultValue="details" className="w-full">
+                                <TabsList className="grid w-full grid-cols-3">
+                                    <TabsTrigger value="details">Details</TabsTrigger>
+                                    <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+                                    <TabsTrigger value="matches">Matches</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="details" className="mt-6">
+                                    <div className="space-y-6">
+                                        <div>
+                                            <h3 className="font-bold text-lg mb-2">Event Details</h3>
+                                            <p className="text-muted-foreground whitespace-pre-wrap">{event.description}</p>
+                                        </div>
+                                        <EventGallery urls={event.galleryUrls || []} />
+                                        <ParticipantList title="Confirmed Participants" icon={UserCheck} participants={confirmedParticipants} max={event.maxParticipants} />
+                                        <ParticipantList title="Waitlist" icon={Hourglass} participants={waitlistedParticipants} />
+                                    </div>
+                                </TabsContent>
+                                <TabsContent value="leaderboard" className="mt-6">
+                                    <EventLeaderboard leaderboard={eventLeaderboard} />
+                                </TabsContent>
+                                <TabsContent value="matches" className="mt-6">
+                                    <MatchList event={event as WithId<Event>} matches={matches || []} playersMap={playersMap} />
+                                </TabsContent>
+                            </Tabs>
+                        </div>
+                        <div className="md:col-span-1">
+                            <Card className="bg-card/50 sticky top-20">
+                                <CardHeader>
+                                    <CardTitle className="text-xl">Registration</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex justify-between items-center text-sm font-bold">
+                                        <span>Slots Filled</span>
+                                        <span>{confirmedParticipants.length} / {event.maxParticipants}</span>
+                                    </div>
+                                    <div className="w-full bg-muted rounded-full h-2.5 my-2">
+                                        <div className="bg-primary h-2.5 rounded-full" style={{ width: `${(confirmedParticipants.length / event.maxParticipants) * 100}%` }}></div>
+                                    </div>
+                                    {isFull && waitlistedParticipants.length > 0 && <p className="text-xs text-center text-muted-foreground">{waitlistedParticipants.length} on waitlist</p>}
+                                </CardContent>
+                                <CardFooter>
+                                    <EventRegistrationManager event={event as WithId<Event>} registrations={registrations || []} />
+                                </CardFooter>
+                            </Card>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
     );
 }
 
@@ -126,36 +216,45 @@ function EventLeaderboard({ leaderboard }: { leaderboard: { player: WithId<UserP
         <div className="space-y-4">
             <EventPodium top3Players={top3Players} />
             <div className="space-y-2">
-                <div className="flex items-center text-[10px] font-black text-slate-400 uppercase tracking-widest px-3">
-                    <div className="w-10">Rank</div>
-                    <div className="flex-1">Player</div>
-                    <div className="w-12 text-right">Points</div>
+                <div className="flex items-center text-[11px] font-black text-emerald-900/40 uppercase tracking-[0.2em] px-4 mb-4">
+                    <div className="w-10">RK</div>
+                    <div className="flex-1">PLAYER</div>
+                    <div className="w-16 text-right">PTS</div>
                 </div>
-                {otherPlayers.map((entry, index) => (
-                    <Link href={`/players/${entry.player.id}`} key={entry.player.id} className="flex items-center p-3 rounded-2xl bg-slate-900/50 hover:bg-slate-900 transition-colors group">
-                        <div className="w-10 font-black text-slate-400 text-base">{index + 4}</div>
-                        <div className="flex-1 flex items-center gap-3">
-                            <div className="relative">
-                                <Avatar className="w-11 h-11">
-                                    <AvatarImage src={entry.player.photoURL || undefined} alt={entry.player.name} />
-                                    <AvatarFallback>{entry.player.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                {entry.player.role === 'member' && (entry.player.isUnlimitedMember || (entry.player.membershipExpiryDate && entry.player.membershipExpiryDate.toDate() > new Date())) && (
-                                    <div className="absolute -bottom-1 -right-1 bg-primary rounded-full p-0.5 border-2 border-card">
-                                        <ShieldCheck className="h-2.5 w-2.5 text-background" />
-                                    </div>
-                                )}
+                {otherPlayers.map((entry, index) => {
+                    const winRate = entry.matchesPlayed > 0 ? (entry.wins / entry.matchesPlayed) * 100 : 0;
+                    const isMember = entry.player.role === 'member' && (entry.player.isUnlimitedMember || (entry.player.membershipExpiryDate && entry.player.membershipExpiryDate.toDate() > new Date()));
+                    
+                    return (
+                        <Link 
+                            href={`/players/${entry.player.id}`} 
+                            key={entry.player.id} 
+                            className="flex items-center p-4 rounded-3xl hover:bg-emerald-50 active:scale-[0.98] transition-all duration-200 group border border-emerald-900/5 shadow-sm hover:shadow-md bg-white"
+                        >
+                            <div className="w-10 font-bold text-emerald-950 text-base">{index + 4}</div>
+                            <div className="flex-1 flex items-center gap-3">
+                                <div className="relative">
+                                    <Avatar className="w-12 h-12 ring-2 ring-emerald-50 ring-offset-2">
+                                        <AvatarImage src={entry.player.photoURL || undefined} alt={entry.player.name} />
+                                        <AvatarFallback>{entry.player.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    {isMember && (
+                                        <div className="absolute -bottom-1 -right-1 bg-emerald-600 rounded-full p-1 border-2 border-white">
+                                            <Check className="h-2 w-2 text-white stroke-[4]" />
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="overflow-hidden">
+                                    <p className="font-bold text-sm text-emerald-950 group-hover:text-emerald-700 transition-colors truncate md:whitespace-normal max-w-[150px] sm:max-w-[250px] md:max-w-none">{entry.player.name}</p>
+                                    <p className="text-[10px] text-emerald-900/40 font-bold uppercase tracking-wider">
+                                        Main: <span className="text-emerald-900/60">{entry.matchesPlayed}</span> • Win: <span className="text-emerald-600">{winRate.toFixed(0)}%</span>
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="font-bold text-sm">{entry.player.name}</p>
-                                <p className="text-[10px] text-slate-400 font-medium">
-                                    Main: <span className="text-slate-200">{entry.matchesPlayed}</span> • Win: <span className="text-emerald-500">{entry.matchesPlayed > 0 ? ((entry.wins / entry.matchesPlayed) * 100).toFixed(0) : 0}%</span>
-                                </p>
-                            </div>
-                        </div>
-                        <div className="w-12 text-right font-black text-lg">{entry.points}</div>
-                    </Link>
-                ))}
+                            <div className="w-16 text-right font-black text-xl text-amber-500">{entry.points}</div>
+                        </Link>
+                    )
+                })}
             </div>
         </div>
     );
@@ -168,26 +267,66 @@ function EventPodium({ top3Players }: { top3Players: { player: WithId<UserProfil
         { rank: 3, player: top3Players[2] }
     ];
     return (
-        <div className="flex items-end justify-center gap-3">
+        <div className="flex items-end justify-center gap-2 sm:gap-3 px-2">
             {podiumSlots.map(({ rank, player }) => {
-                if (!player) return <div key={rank} className={`flex-1 ${rank === 1 ? 'flex-[1.2]' : ''}`} />;
+                if (!player) return <div key={rank} className={`flex-1 ${rank === 1 ? 'z-10 flex-[1.2]' : ''}`} />;
+                const isRank1 = rank === 1;
                 return (
-                    <Link href={`/players/${player.player.id}`} key={player.player.id} className={`flex-1 flex flex-col items-center group ${rank === 1 ? 'flex-[1.2]' : ''}`}>
-                        <div className={`w-full rounded-3xl flex flex-col items-center shadow-lg transition-transform ${rank === 1 ? 'rank-card-1 glass-card pt-6 pb-8 rounded-[32px] relative z-10 scale-105 group-hover:scale-110' : rank === 2 ? 'rank-card-2 glass-card pt-4 pb-5 group-hover:scale-105' : 'rank-card-3 glass-card pt-4 pb-5 group-hover:scale-105'}`}>
-                            {rank === 1 && <Crown className="absolute -top-3 text-primary h-8 w-8 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" />}
-                            <div className={`relative mb-3 ${rank === 1 ? 'mt-2 mb-4' : ''}`}>
-                                <div className={`rounded-full p-0.5 shadow-xl ${rank === 1 ? 'w-20 h-20 border-4 border-primary' : 'w-16 h-16 border-2 border-white/20'}`}>
+                    <Link 
+                        href={`/players/${player.player.id}`} 
+                        key={player.player.id} 
+                        className={cn(
+                            "flex-1 flex flex-col items-center group transition-all duration-300",
+                            isRank1 ? "scale-105 z-10 flex-[1.2]" : "scale-95"
+                        )}
+                    >
+                        <div className={cn(
+                            "w-full rounded-3xl flex flex-col items-center shadow-sm transition-transform border",
+                            isRank1 ? "rank-card-1 pt-6 pb-8 rounded-[32px]" : (rank === 2 ? "rank-card-2 pt-4 pb-5" : "rank-card-3 pt-4 pb-5")
+                        )}>
+                            <div className="relative mb-3">
+                                {isRank1 && (
+                                    <div className="absolute -top-6 left-1/2 -translate-x-1/2">
+                                        <Crown className="w-8 h-8 text-amber-500 drop-shadow-sm" />
+                                    </div>
+                                )}
+                                <div className={cn(
+                                    "rounded-full p-0.5 shadow-md bg-white",
+                                    isRank1 ? "w-20 h-20 border-4 border-emerald-500/30" : "w-16 h-16 border-2 border-emerald-500/10"
+                                )}>
                                     <Avatar className="w-full h-full">
                                         <AvatarImage src={player.player.photoURL || undefined} alt={player.player.name} />
                                         <AvatarFallback>{player.player.name.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                 </div>
-                                <div className={`absolute -bottom-1 -right-1 rounded-full flex items-center justify-center text-xs font-black border-2 border-background shadow-lg ${rank === 1 ? 'w-7 h-7 bg-primary text-background' : 'w-6 h-6 bg-slate-300 text-slate-900'}`}>{rank}</div>
+                                <div className={cn(
+                                    "absolute -bottom-1 -right-1 rounded-full flex items-center justify-center text-xs font-black border-2 border-white shadow-sm",
+                                    rank === 1 ? "w-7 h-7 bg-emerald-800 text-white" : "w-6 h-6 bg-emerald-700 text-white"
+                                )}>
+                                    {rank}
+                                </div>
                             </div>
-                            <div className="text-center px-1">
-                                <p className={`font-bold truncate ${rank === 1 ? 'text-base text-white tracking-tight max-w-[100px]' : 'text-xs text-slate-200 max-w-[80px]'}`}>{player.player.name}</p>
-                                <p className={`font-black mt-0.5 ${rank === 1 ? 'text-primary text-2xl' : 'text-slate-100 font-extrabold text-base'}`}>{player.points}</p>
-                                <p className={`-mt-1 uppercase tracking-widest font-bold ${rank === 1 ? 'text-[10px] text-primary/70 font-black' : 'text-[9px] text-slate-400'}`}>PTS</p>
+                            <div className="text-center w-full px-1">
+                                <p className={cn(
+                                    "font-bold px-1 text-emerald-950",
+                                    isRank1 
+                                        ? "text-sm truncate md:whitespace-normal max-w-[100px] md:max-w-none" 
+                                        : "text-xs truncate md:whitespace-normal max-w-[80px] md:max-w-none"
+                                )}>
+                                    {player.player.name}
+                                </p>
+                                <div className="mt-1 flex flex-col items-center">
+                                    <p className={cn(
+                                        "font-black tracking-tight leading-none text-amber-500",
+                                        isRank1 ? "text-2xl" : "text-xl"
+                                    )}>
+                                        {player.points}
+                                    </p>
+                                    <p className={cn(
+                                        "uppercase tracking-widest font-bold text-emerald-900/40",
+                                        isRank1 ? "text-[10px]" : "text-[9px]"
+                                    )}>PTS</p>
+                                </div>
                             </div>
                         </div>
                     </Link>

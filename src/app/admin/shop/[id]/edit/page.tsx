@@ -1,7 +1,6 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProductForm } from '@/components/admin/product-form';
 import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
@@ -24,7 +23,6 @@ export default function EditProductPage() {
     const { data: product, isLoading } = useDoc<WithId<Product>>(productRef);
 
     return (
-        <SidebarInset>
             <div className="p-2 sm:p-6 lg:p-8">
                 <div className="max-w-2xl mx-auto">
                      <Button asChild variant="outline" className="mb-4">
@@ -52,6 +50,5 @@ export default function EditProductPage() {
                     </Card>
                 </div>
             </div>
-        </SidebarInset>
     );
 }

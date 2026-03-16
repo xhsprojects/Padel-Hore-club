@@ -1,6 +1,5 @@
 'use client';
 
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFirebase, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, where, orderBy } from 'firebase/firestore';
@@ -50,21 +49,19 @@ export default function MyOrdersPage() {
 
     if (isLoading || isUserLoading) {
         return (
-            <SidebarInset>
-                <div className="p-2 sm:p-6 lg:p-8">
-                    <Card className="max-w-4xl mx-auto">
-                         <CardHeader>
-                            <Skeleton className="h-8 w-48" />
-                            <Skeleton className="h-4 w-72" />
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <Skeleton className="h-28 w-full" />
-                            <Skeleton className="h-28 w-full" />
-                            <Skeleton className="h-28 w-full" />
-                        </CardContent>
-                    </Card>
-                </div>
-            </SidebarInset>
+            <div className="p-2 sm:p-6 lg:p-8">
+                <Card className="max-w-4xl mx-auto">
+                     <CardHeader>
+                        <Skeleton className="h-8 w-48" />
+                        <Skeleton className="h-4 w-72" />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <Skeleton className="h-28 w-full" />
+                        <Skeleton className="h-28 w-full" />
+                        <Skeleton className="h-28 w-full" />
+                    </CardContent>
+                </Card>
+            </div>
         );
     }
     
@@ -73,65 +70,63 @@ export default function MyOrdersPage() {
     }
 
     return (
-        <SidebarInset>
-            <div className="p-2 sm:p-6 lg:p-8">
-                <Card className="max-w-4xl mx-auto">
-                    <CardHeader>
-                        <CardTitle className="font-headline text-2xl flex items-center gap-2">
-                           <Receipt className="h-6 w-6" />
-                           My Orders
-                        </CardTitle>
-                        <CardDescription>
-                            Here is a list of your past and current orders.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {orders && orders.length > 0 ? (
-                            <div className="space-y-4">
-                                {orders.map(order => (
-                                    <Card key={order.id} className="p-4 flex flex-col sm:flex-row items-start gap-4">
-                                        <div className="relative w-24 h-24 flex-shrink-0 bg-muted rounded-md overflow-hidden">
-                                            {order.productImage ? (
-                                                <Image src={order.productImage} alt={order.productName} fill className="object-cover" />
-                                            ) : (
-                                                <Package className="w-full h-full text-muted-foreground/30 p-4"/>
-                                            )}
+        <div className="p-2 sm:p-6 lg:p-8">
+            <Card className="max-w-4xl mx-auto">
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl flex items-center gap-2">
+                       <Receipt className="h-6 w-6" />
+                       My Orders
+                    </CardTitle>
+                    <CardDescription>
+                        Here is a list of your past and current orders.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {orders && orders.length > 0 ? (
+                        <div className="space-y-4">
+                            {orders.map(order => (
+                                <Card key={order.id} className="p-4 flex flex-col sm:flex-row items-start gap-4">
+                                    <div className="relative w-24 h-24 flex-shrink-0 bg-muted rounded-md overflow-hidden">
+                                        {order.productImage ? (
+                                            <Image src={order.productImage} alt={order.productName} fill className="object-cover" />
+                                        ) : (
+                                            <Package className="w-full h-full text-muted-foreground/30 p-4"/>
+                                        )}
+                                    </div>
+                                    <div className="flex-grow">
+                                        <div className="flex justify-between items-start">
+                                            <h3 className="font-bold">{order.productName}</h3>
+                                            <Badge className={statusStyles[order.status]}>{order.status.replace('-', ' ')}</Badge>
                                         </div>
-                                        <div className="flex-grow">
-                                            <div className="flex justify-between items-start">
-                                                <h3 className="font-bold">{order.productName}</h3>
-                                                <Badge className={statusStyles[order.status]}>{order.status.replace('-', ' ')}</Badge>
-                                            </div>
-                                            <p className="text-sm text-muted-foreground">Order ID: {order.id}</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {format(order.orderTimestamp.toDate(), 'dd MMMM yyyy, p')}
-                                            </p>
-                                            
-                                            <div className="mt-2 text-sm space-y-1">
-                                                {Object.entries(order.selectedVariation).map(([key, value]) => (
-                                                    <p key={key}>
-                                                        <span className="font-semibold">{key}:</span> {value}
-                                                    </p>
-                                                ))}
-                                                <p><span className="font-semibold">Quantity:</span> {order.quantity}</p>
-                                            </div>
+                                        <p className="text-sm text-muted-foreground">Order ID: {order.id}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            {format(order.orderTimestamp.toDate(), 'dd MMMM yyyy, p')}
+                                        </p>
+                                        
+                                        <div className="mt-2 text-sm space-y-1">
+                                            {Object.entries(order.selectedVariation).map(([key, value]) => (
+                                                <p key={key}>
+                                                    <span className="font-semibold">{key}:</span> {value}
+                                                </p>
+                                            ))}
+                                            <p><span className="font-semibold">Quantity:</span> {order.quantity}</p>
                                         </div>
-                                        <div className="text-right flex-shrink-0 sm:pl-4">
-                                            <p className="font-black text-primary text-lg">
-                                                Rp {order.totalPrice.toLocaleString('id-ID')}
-                                            </p>
-                                        </div>
-                                    </Card>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-12 text-muted-foreground">
-                                <p>You haven't placed any orders yet.</p>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-        </SidebarInset>
+                                    </div>
+                                    <div className="text-right flex-shrink-0 sm:pl-4">
+                                        <p className="font-black text-primary text-lg">
+                                            Rp {order.totalPrice.toLocaleString('id-ID')}
+                                        </p>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 text-muted-foreground">
+                            <p>You haven't placed any orders yet.</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        </div>
     );
 }

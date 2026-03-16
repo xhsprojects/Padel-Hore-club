@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUser, useDoc, useFirebase, useMemoFirebase, useCollection } from '@/firebase';
 import { Loader2, UserCheck, CheckCircle2, XCircle, Trophy } from 'lucide-react';
@@ -196,7 +195,6 @@ export default function EventScannerPage() {
 
     if (pageIsLoading) {
         return (
-            <SidebarInset>
                 <div className="p-4 sm:p-6 lg:p-8">
                     <div className="max-w-4xl mx-auto">
                         <Skeleton className="h-10 w-48 mb-4" />
@@ -217,21 +215,18 @@ export default function EventScannerPage() {
                         </Card>
                     </div>
                 </div>
-            </SidebarInset>
         );
     }
     
     const isDefaultAdmin = user?.uid === DEFAULT_ADMIN_UID;
     if (userProfile?.role !== 'admin' && !isDefaultAdmin) {
         return (
-            <SidebarInset>
                 <div className="p-8 text-center">
                     <Card className="max-w-md mx-auto">
                         <CardHeader><CardTitle>Access Denied</CardTitle></CardHeader>
                         <CardContent><p>You do not have permission to view this page.</p></CardContent>
                     </Card>
                 </div>
-            </SidebarInset>
         );
     }
 
@@ -239,7 +234,6 @@ export default function EventScannerPage() {
 
     if (status !== 'ongoing') {
         return (
-            <SidebarInset>
                 <div className="p-8 text-center">
                     <Card className="max-w-md mx-auto">
                         <CardHeader>
@@ -256,12 +250,10 @@ export default function EventScannerPage() {
                         </CardContent>
                     </Card>
                 </div>
-            </SidebarInset>
         )
     }
 
     return (
-        <SidebarInset>
             <div className="p-4 sm:p-6 lg:p-8">
                  <div className="max-w-4xl mx-auto">
                      <Button variant="outline" onClick={() => router.back()} className="mb-4">
@@ -318,6 +310,5 @@ export default function EventScannerPage() {
                     </Card>
                 </div>
             </div>
-        </SidebarInset>
     );
 }

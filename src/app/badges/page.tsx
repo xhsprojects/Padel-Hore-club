@@ -1,6 +1,5 @@
 'use client';
 
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ALL_BADGES } from '@/lib/badges';
@@ -34,30 +33,28 @@ export default function BadgeSystemPage() {
     }, []);
 
     return (
-        <SidebarInset>
-            <div className="p-2 sm:p-6 lg:p-8">
-                <Card className="max-w-4xl mx-auto">
-                    <CardHeader className="text-center">
-                        <Award className="mx-auto h-12 w-12 text-primary" />
-                        <CardTitle className="font-headline text-3xl mt-2">Sistem Badge Padel Hore</CardTitle>
-                        <CardDescription className="text-lg">
-                            Koleksi semua lencana untuk buktikan status legendamu di lapangan!
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <Accordion type="multiple" className="w-full" defaultValue={CATEGORY_ORDER.map(c => c.toLowerCase())}>
-                            {CATEGORY_ORDER.map(category => (
-                                <BadgeCategorySection
-                                    key={category}
-                                    title={category}
-                                    badges={groupedBadges[category]}
-                                />
-                            ))}
-                        </Accordion>
-                    </CardContent>
-                </Card>
-            </div>
-        </SidebarInset>
+        <div className="p-2 sm:p-6 lg:p-8">
+            <Card className="max-w-4xl mx-auto">
+                <CardHeader className="text-center">
+                    <Award className="mx-auto h-12 w-12 text-primary" />
+                    <CardTitle className="font-headline text-3xl mt-2">Sistem Badge Padel Hore</CardTitle>
+                    <CardDescription className="text-lg">
+                        Koleksi semua lencana untuk buktikan status legendamu di lapangan!
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <Accordion type="multiple" className="w-full" defaultValue={CATEGORY_ORDER.map(c => c.toLowerCase())}>
+                        {CATEGORY_ORDER.map(category => (
+                            <BadgeCategorySection
+                                key={category}
+                                title={category}
+                                badges={groupedBadges[category]}
+                            />
+                        ))}
+                    </Accordion>
+                </CardContent>
+            </Card>
+        </div>
     );
 }
 

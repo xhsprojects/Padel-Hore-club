@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserManagementTable } from '@/components/admin/player-form';
 import { CreateUserForm } from '@/components/admin/create-user-form';
@@ -119,7 +118,6 @@ export default function ManageUsersPage() {
 
     if (isUserLoading || isProfileLoading || !user) {
         return (
-             <SidebarInset>
                  <div className="p-2 sm:p-6 lg:p-8">
                     <Card className="max-w-4xl mx-auto">
                         <CardHeader>
@@ -131,14 +129,12 @@ export default function ManageUsersPage() {
                         </CardContent>
                     </Card>
                 </div>
-            </SidebarInset>
         )
     }
 
     const isDefaultAdmin = user.uid === DEFAULT_ADMIN_UID;
     if (userProfile?.role !== 'admin' && !isDefaultAdmin) {
         return (
-            <SidebarInset>
                 <div className="p-2 sm:p-6 lg:p-8 text-center">
                     <Card className="max-w-md mx-auto">
                         <CardHeader>
@@ -150,51 +146,48 @@ export default function ManageUsersPage() {
                         </CardContent>
                     </Card>
                 </div>
-            </SidebarInset>
         );
     }
 
     return (
         <>
-            <SidebarInset>
-                <div className="p-2 sm:p-6 lg:p-8">
-                    <Card className="max-w-4xl mx-auto">
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="font-headline text-2xl">User Management</CardTitle>
-                                <CardDescription>View, create, edit, and delete users.</CardDescription>
-                            </div>
-                             <Dialog open={isCreateUserOpen} onOpenChange={setCreateUserOpen}>
-                                <DialogTrigger asChild>
-                                    <Button>
-                                        <UserPlus className="mr-2 h-4 w-4" />
-                                        Create User
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent className="sm:max-w-[425px]">
-                                    <DialogHeader>
-                                        <DialogTitle>Create New User</DialogTitle>
-                                        <DialogDescription>
-                                            Enter the details for the new user. They will be able to log in with this email and password.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="pt-4">
-                                      <CreateUserForm setOpen={setCreateUserOpen} />
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
-                        </CardHeader>
-                        <CardContent>
-                            <UserManagementTable 
-                                users={users || []}
-                                isLoading={usersLoading}
-                                onEditUser={handleEditClick}
-                                onDeleteUser={handleDeleteClick}
-                            />
-                        </CardContent>
-                    </Card>
-                </div>
-            </SidebarInset>
+            <div className="p-2 sm:p-6 lg:p-8">
+                <Card className="max-w-4xl mx-auto">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div>
+                            <CardTitle className="font-headline text-2xl">User Management</CardTitle>
+                            <CardDescription>View, create, edit, and delete users.</CardDescription>
+                        </div>
+                         <Dialog open={isCreateUserOpen} onOpenChange={setCreateUserOpen}>
+                            <DialogTrigger asChild>
+                                <Button>
+                                    <UserPlus className="mr-2 h-4 w-4" />
+                                    Create User
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Create New User</DialogTitle>
+                                    <DialogDescription>
+                                        Enter the details for the new user. They will be able to log in with this email and password.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="pt-4">
+                                  <CreateUserForm setOpen={setCreateUserOpen} />
+                                </div>
+                            </DialogContent>
+                        </Dialog>
+                    </CardHeader>
+                    <CardContent>
+                        <UserManagementTable 
+                            users={users || []}
+                            isLoading={usersLoading}
+                            onEditUser={handleEditClick}
+                            onDeleteUser={handleDeleteClick}
+                        />
+                    </CardContent>
+                </Card>
+            </div>
 
              {/* Dialogs are now here at the page level */}
             <Dialog open={isEditDialogOpen} onOpenChange={handleEditOpenChange}>

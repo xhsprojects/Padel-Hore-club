@@ -1,6 +1,5 @@
 'use client';
 
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useUser, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
@@ -40,24 +39,22 @@ export default function MembershipPage() {
 
     if (isLoading || !user || !userProfile) {
         return (
-            <SidebarInset>
-                <div className="p-2 sm:p-6 lg:p-8">
-                    <Card className="max-w-4xl mx-auto">
-                        <CardHeader className="text-center">
-                            <Skeleton className="h-12 w-12 mx-auto" />
-                            <Skeleton className="h-8 w-80 mx-auto mt-4" />
-                            <Skeleton className="h-6 w-96 mx-auto mt-2" />
-                        </CardHeader>
-                        <CardContent className="space-y-8">
-                            <Skeleton className="h-24 w-full" />
-                            <div className="grid md:grid-cols-2 gap-8">
-                                <Skeleton className="h-80 w-full" />
-                                <Skeleton className="h-64 w-full" />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </SidebarInset>
+            <div className="p-2 sm:p-6 lg:p-8">
+                <Card className="max-w-4xl mx-auto">
+                    <CardHeader className="text-center">
+                        <Skeleton className="h-12 w-12 mx-auto" />
+                        <Skeleton className="h-8 w-80 mx-auto mt-4" />
+                        <Skeleton className="h-6 w-96 mx-auto mt-2" />
+                    </CardHeader>
+                    <CardContent className="space-y-8">
+                        <Skeleton className="h-24 w-full" />
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <Skeleton className="h-80 w-full" />
+                            <Skeleton className="h-64 w-full" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         );
     }
     
@@ -133,54 +130,52 @@ export default function MembershipPage() {
     };
 
     return (
-        <SidebarInset>
-            <div className="p-2 sm:p-6 lg:p-8">
-                <Card className="max-w-4xl mx-auto">
-                    <CardHeader className="text-center">
-                        <Gem className="mx-auto h-12 w-12 text-primary" />
-                        <CardTitle className="font-headline text-3xl mt-2">Padel Hore Membership</CardTitle>
-                        <CardDescription className="text-lg">Buka Keuntungan Eksklusif & Maksimalkan Poin Anda!</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-8">
-                        {renderStatusCard()}
-                        
-                        <div className="grid md:grid-cols-2 gap-8">
-                            <div>
-                                <h3 className="font-bold text-xl mb-4">Keuntungan Member</h3>
-                                 <p className="text-muted-foreground mb-4">
-                                    Menjadi member di Padel Hore memberikan berbagai keuntungan eksklusif yang dirancang untuk meningkatkan pengalaman bermain dan loyalitas Anda. Berikut adalah rincian keuntungan utamanya:
-                                </p>
-                                <ul className="space-y-4">
-                                    <BenefitItem icon={Star} title="Poin Partisipasi Lebih Tinggi" description="Setiap kali bertanding, member mendapatkan +10 poin, lebih tinggi dibandingkan non-member yang hanya mendapatkan +8 poin." />
-                                    <BenefitItem icon={BarChart} title="Akses Statistik Mendalam" description="Member dapat melihat data performa pribadi yang detail, seperti persentase kemenangan (win rate), histori poin secara rinci, hingga partner bermain favorit." />
-                                    <BenefitItem icon={ClipboardCheck} title="Prioritas Pendaftaran" description="Member mendapatkan prioritas atau slot lebih awal saat mendaftar turnamen atau acara khusus yang diadakan oleh klub." />
-                                    <BenefitItem icon={Trophy} title="Akses Tier Tertinggi" description="Kenaikan peringkat ke tier eksklusif seperti silver atau gold beserta seluruh privilege-nya hanya dapat diaktifkan jika status pemain adalah member." />
-                                    <BenefitItem icon={Gift} title="Keuntungan Tambahan" description="Mendapatkan akses ke coaching clinic gratis atau diskon khusus untuk pembelian merchandise dan booking lapangan sesuai dengan tier yang dicapai." />
-                                    <BenefitItem icon={Crown} title="Identitas Digital Khusus" description="Kartu member digital pada profil aplikasi akan memiliki label 'MEMBER' yang mencolok dan badge tier yang menunjukkan prestise Anda di komunitas." />
-                                </ul>
-                            </div>
-                             <div>
-                                <h3 className="font-bold text-xl mb-4">Cara Bergabung</h3>
-                                <ol className="list-decimal list-inside space-y-4">
-                                    <li>
-                                        <h4 className="font-semibold inline">Hubungi Admin</h4>
-                                        <p className="text-muted-foreground text-sm pl-2">Klik tombol di atas atau kirim pesan WhatsApp ke admin kami untuk meminta keanggotaan.</p>
-                                    </li>
-                                     <li>
-                                        <h4 className="font-semibold inline">Selesaikan Pembayaran</h4>
-                                        <p className="text-muted-foreground text-sm pl-2">Admin akan memberikan detail pembayaran untuk biaya langganan.</p>
-                                    </li>
-                                     <li>
-                                        <h4 className="font-semibold inline">Aktivasi</h4>
-                                        <p className="text-muted-foreground text-sm pl-2">Setelah pembayaran dikonfirmasi, admin akan mengaktifkan status Member Anda langsung di sistem.</p>
-                                    </li>
-                                </ol>
-                            </div>
+        <div className="p-2 sm:p-6 lg:p-8">
+            <Card className="max-w-4xl mx-auto">
+                <CardHeader className="text-center">
+                    <Gem className="mx-auto h-12 w-12 text-primary" />
+                    <CardTitle className="font-headline text-3xl mt-2">Padel Hore Membership</CardTitle>
+                    <CardDescription className="text-lg">Buka Keuntungan Eksklusif & Maksimalkan Poin Anda!</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                    {renderStatusCard()}
+                    
+                    <div className="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 className="font-bold text-xl mb-4">Keuntungan Member</h3>
+                             <p className="text-muted-foreground mb-4">
+                                Menjadi member di Padel Hore memberikan berbagai keuntungan eksklusif yang dirancang untuk meningkatkan pengalaman bermain dan loyalitas Anda. Berikut adalah rincian keuntungan utamanya:
+                            </p>
+                            <ul className="space-y-4">
+                                <BenefitItem icon={Star} title="Poin Partisipasi Lebih Tinggi" description="Setiap kali bertanding, member mendapatkan +10 poin, lebih tinggi dibandingkan non-member yang hanya mendapatkan +8 poin." />
+                                <BenefitItem icon={BarChart} title="Akses Statistik Mendalam" description="Member dapat melihat data performa pribadi yang detail, seperti persentase kemenangan (win rate), histori poin secara rinci, hingga partner bermain favorit." />
+                                <BenefitItem icon={ClipboardCheck} title="Prioritas Pendaftaran" description="Member mendapatkan prioritas atau slot lebih awal saat mendaftar turnamen atau acara khusus yang diadakan oleh klub." />
+                                <BenefitItem icon={Trophy} title="Akses Tier Tertinggi" description="Kenaikan peringkat ke tier eksklusif seperti silver atau gold beserta seluruh privilege-nya hanya dapat diaktifkan jika status pemain adalah member." />
+                                <BenefitItem icon={Gift} title="Keuntungan Tambahan" description="Mendapatkan akses ke coaching clinic gratis atau diskon khusus untuk pembelian merchandise dan booking lapangan sesuai dengan tier yang dicapai." />
+                                <BenefitItem icon={Crown} title="Identitas Digital Khusus" description="Kartu member digital pada profil aplikasi akan memiliki label 'MEMBER' yang mencolok dan badge tier yang menunjukkan prestise Anda di komunitas." />
+                            </ul>
                         </div>
-                    </CardContent>
-                </Card>
-            </div>
-        </SidebarInset>
+                         <div>
+                            <h3 className="font-bold text-xl mb-4">Cara Bergabung</h3>
+                            <ol className="list-decimal list-inside space-y-4">
+                                <li>
+                                    <h4 className="font-semibold inline">Hubungi Admin</h4>
+                                    <p className="text-muted-foreground text-sm pl-2">Klik tombol di atas atau kirim pesan WhatsApp ke admin kami untuk meminta keanggotaan.</p>
+                                </li>
+                                 <li>
+                                    <h4 className="font-semibold inline">Selesaikan Pembayaran</h4>
+                                    <p className="text-muted-foreground text-sm pl-2">Admin akan memberikan detail pembayaran untuk biaya langganan.</p>
+                                </li>
+                                 <li>
+                                    <h4 className="font-semibold inline">Aktivasi</h4>
+                                    <p className="text-muted-foreground text-sm pl-2">Setelah pembayaran dikonfirmasi, admin akan mengaktifkan status Member Anda langsung di sistem.</p>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     );
 }
 

@@ -130,9 +130,9 @@ export function LeaderboardClient() {
     ];
     
     return (
-        <div className="flex items-end justify-center gap-2 sm:gap-4 px-2">
+        <div className="flex items-end justify-center gap-2 sm:gap-3 px-0">
             {podiumSlots.map(({ rank, player }) => {
-                if (!player) return <div key={rank} className={`flex-1 ${rank === 1 ? 'z-10' : ''}`} />;
+                if (!player) return <div key={rank} className={`flex-1 ${rank === 1 ? 'z-10 flex-[1.2]' : ''}`} />;
                 const isRank1 = rank === 1;
                 
                 return (
@@ -141,22 +141,22 @@ export function LeaderboardClient() {
                         key={player.id} 
                         className={cn(
                             "flex-1 flex flex-col items-center group transition-all duration-300",
-                            isRank1 ? "scale-110 z-10 -translate-y-2" : "scale-95"
+                            isRank1 ? "scale-105 z-10 flex-[1.2]" : "scale-95"
                         )}
                     >
                         <div className={cn(
-                            "w-full rounded-[2rem] flex flex-col items-center p-4 pt-6 pb-6 shadow-sm border",
-                            isRank1 ? "podium-card-highlight border-emerald-500/30" : "podium-card border-emerald-500/10"
+                            "w-full rounded-3xl flex flex-col items-center shadow-sm transition-transform border",
+                            isRank1 ? "rank-card-1 pt-6 pb-8 rounded-[32px]" : (rank === 2 ? "rank-card-2 pt-4 pb-5" : "rank-card-3 pt-4 pb-5")
                         )}>
                             <div className="relative mb-3">
                                 {isRank1 && (
                                     <div className="absolute -top-6 left-1/2 -translate-x-1/2">
-                                        <Crown className="w-8 h-8 text-yellow-500 drop-shadow-md" />
+                                        <Crown className="w-8 h-8 text-amber-500 drop-shadow-sm" />
                                     </div>
                                 )}
                                 <div className={cn(
-                                    "rounded-full p-1 bg-white shadow-inner",
-                                    isRank1 ? "w-20 h-20 shadow-emerald-500/20" : "w-16 h-16"
+                                    "rounded-full p-0.5 shadow-md bg-white",
+                                    isRank1 ? "w-20 h-20 border-4 border-emerald-500/30" : "w-16 h-16 border-2 border-emerald-500/10"
                                 )}>
                                     <Avatar className="w-full h-full">
                                         <AvatarImage src={player.photoURL || undefined} alt={player.name} />
@@ -164,27 +164,32 @@ export function LeaderboardClient() {
                                     </Avatar>
                                 </div>
                                 <div className={cn(
-                                    "absolute -bottom-1 -right-1 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white shadow-sm",
-                                    rank === 1 ? "w-6 h-6 bg-emerald-600 text-white" : "w-5 h-5 bg-emerald-500 text-white"
+                                    "absolute -bottom-1 -right-1 rounded-full flex items-center justify-center text-xs font-black border-2 border-white shadow-sm",
+                                    rank === 1 ? "w-7 h-7 bg-emerald-800 text-white" : "w-6 h-6 bg-emerald-700 text-white"
                                 )}>
                                     {rank}
                                 </div>
                             </div>
-                            <div className="text-center w-full">
+                            <div className="text-center w-full px-1">
                                 <p className={cn(
-                                    "font-bold truncate px-1",
-                                    isRank1 ? "text-sm text-foreground" : "text-xs text-foreground/80"
+                                    "font-bold px-1 text-emerald-950",
+                                    isRank1 
+                                        ? "text-sm truncate md:whitespace-normal max-w-[100px] md:max-w-none" 
+                                        : "text-xs truncate md:whitespace-normal max-w-[80px] md:max-w-none"
                                 )}>
                                     {player.name}
                                 </p>
                                 <div className="mt-1 flex flex-col items-center">
                                     <p className={cn(
-                                        "font-black tracking-tight leading-none",
-                                        isRank1 ? "text-2xl text-emerald-800" : "text-xl text-emerald-700"
+                                        "font-black tracking-tight leading-none text-amber-500",
+                                        isRank1 ? "text-2xl" : "text-xl"
                                     )}>
                                         {player.total_points}
                                     </p>
-                                    <p className="text-[9px] font-black text-emerald-900/40 uppercase tracking-widest mt-0.5">PTS</p>
+                                    <p className={cn(
+                                        "uppercase tracking-widest font-bold text-emerald-900/40",
+                                        isRank1 ? "text-[10px]" : "text-[9px]"
+                                    )}>PTS</p>
                                 </div>
                             </div>
                         </div>
@@ -196,9 +201,10 @@ export function LeaderboardClient() {
   }
 
   return (
-      <div className="min-h-screen bg-background pb-32">
+      <div className="min-h-screen bg-[#f0f9f4] pb-32">
+        <div className="max-w-5xl mx-auto">
         {/* Header Section */}
-        <div className="px-6 pt-6 space-y-6">
+        <div className="px-4 md:px-6 pt-6 space-y-6">
             {/* Search & Filter */}
             <div className="flex gap-2">
                 <div className="relative flex-1 group">
@@ -272,19 +278,19 @@ export function LeaderboardClient() {
         ) : (
             <>
                 {/* Podium Section */}
-                <div className="mt-8 px-6">
+                <div className="mt-8 px-4 md:px-6">
                     {isLoading ? <PodiumSkeleton /> : renderPodium()}
                 </div>
 
                 {/* List Section */}
-                <div className="mt-10 bg-white rounded-t-[3rem] px-6 pt-10 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.05)] ring-1 ring-emerald-900/5">
+                <div className="mt-10 bg-white rounded-t-[3rem] px-4 md:px-6 pt-10 shadow-[0_-20px_40px_-15px_rgba(0,0,0,0.05)] ring-1 ring-emerald-900/5">
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-2xl font-black text-emerald-950 px-2">{leaderboardTitle}</h2>
                     </div>
                     
                     <div className="space-y-2 pb-10">
                         {/* Table Header */}
-                        <div className="flex items-center text-[11px] font-black text-emerald-900/30 uppercase tracking-[0.2em] px-4 mb-4">
+                        <div className="flex items-center text-[11px] font-black text-emerald-900/40 uppercase tracking-[0.2em] px-4 mb-4">
                             <div className="w-10">RK</div>
                             <div className="flex-1">PLAYER</div>
                             <div className="w-16 text-right">PTS</div>
@@ -315,14 +321,14 @@ export function LeaderboardClient() {
                                                         </div>
                                                     )}
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-sm text-emerald-950 group-hover:text-emerald-700 transition-colors">{player.name}</p>
+                                                <div className="overflow-hidden">
+                                                    <p className="font-bold text-sm text-emerald-950 group-hover:text-emerald-700 transition-colors truncate md:whitespace-normal max-w-[150px] sm:max-w-[250px] md:max-w-none">{player.name}</p>
                                                     <p className="text-[10px] text-emerald-900/40 font-bold uppercase tracking-wider">
                                                         Main: <span className="text-emerald-900/60">{player.match_count}</span> • Win: <span className="text-emerald-600">{winRate.toFixed(0)}%</span>
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="w-16 text-right font-black text-xl text-emerald-600/80">
+                                            <div className="w-16 text-right font-black text-xl text-amber-500">
                                                 {player.total_points}
                                             </div>
                                         </Link>
@@ -341,6 +347,7 @@ export function LeaderboardClient() {
                 </div>
             </>
         )}
+        </div>
     </div>
   );
 }

@@ -1,13 +1,12 @@
 'use client';
 
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { POINT_RULES, DEFAULT_THRESHOLDS, DEFAULT_RESET_PERCENTAGES } from '@/lib/constants';
 import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { AppSettings, Tier } from '@/lib/types';
-import { Flame, ShieldCheck, Star, Trophy, Award, RefreshCw, Loader2 } from 'lucide-react';
+import { Trophy, Star, Flame, Award, ShieldCheck, RefreshCw, Loader2 } from 'lucide-react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { POINT_RULES, DEFAULT_THRESHOLDS, DEFAULT_RESET_PERCENTAGES } from '@/lib/constants';
 import React from 'react';
 
 export default function PointSystemPage() {
@@ -30,31 +29,29 @@ export default function PointSystemPage() {
     ];
 
     return (
-        <SidebarInset>
-            <div className="p-2 sm:p-6 lg:p-8">
-                <Card className="max-w-4xl mx-auto">
-                    <CardHeader className="text-center">
-                        <Trophy className="mx-auto h-12 w-12 text-primary" />
+        <div className="p-4 sm:p-6 lg:p-8">
+            <div className="max-w-4xl mx-auto space-y-8">
+                <Card className="border-none shadow-none bg-transparent">
+                    <CardHeader className="text-center pb-2">
+                        <Trophy className="mx-auto h-12 w-12 text-emerald-600" />
                         <CardTitle className="font-headline text-3xl mt-2">Sistem Poin Padel Hore</CardTitle>
                         <CardDescription className="text-lg">Pahami cara kerja poin untuk naik peringkat!</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {isLoading ? (
                             <div className="flex justify-center py-12">
-                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                                <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
                             </div>
                         ) : (
-                            <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+                            <Accordion type="single" collapsible defaultValue="item-1" className="w-full space-y-4">
                                 <PointCategory
                                     value="item-1"
                                     title="Poin Dasar (Partisipasi & Hasil)"
                                     icon={Star}
                                 >
                                     <PointDetail label="Partisipasi (Member)" value={POINT_RULES.PARTICIPATION.MEMBER} />
-                                    <PointDetail label="Partisipasi (Non-Member)" value={POINT_RULES.PARTICIPATION.NON_MEMBER} />
                                     <PointDetail label="Menang Pertandingan" value={POINT_RULES.RESULT.WIN} />
                                     <PointDetail label="Kalah Pertandingan" value={POINT_RULES.RESULT.LOSS} />
-                                    <PointDetail label="Seri Pertandingan" value={POINT_RULES.RESULT.DRAW} />
                                 </PointCategory>
 
                                 <PointCategory
@@ -105,7 +102,7 @@ export default function PointSystemPage() {
                                         
                                         <div>
                                             <p className="font-semibold text-foreground">Formula Reset:</p>
-                                            <code className="relative mt-1 block rounded bg-muted px-4 py-2 font-mono text-sm font-semibold text-primary">
+                                            <code className="relative mt-1 block rounded bg-muted px-4 py-2 font-mono text-sm font-semibold text-emerald-600">
                                                 Poin Baru = (Poin Musim Lalu × % Tier) + Poin Dasar Tier
                                             </code>
                                         </div>
@@ -134,23 +131,23 @@ export default function PointSystemPage() {
                     </CardContent>
                 </Card>
             </div>
-        </SidebarInset>
+        </div>
     );
 }
 
 function PointCategory({ value, title, icon: Icon, children }: { value: string, title: string, icon: React.ElementType, children: React.ReactNode }) {
     return (
-        <AccordionItem value={value}>
-            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-primary">
-                        <Icon className="h-5 w-5" />
+        <AccordionItem value={value} className="border border-emerald-500/10 rounded-3xl overflow-hidden bg-card shadow-sm px-6">
+            <AccordionTrigger className="text-lg font-bold hover:no-underline py-6">
+                <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-500/10">
+                        <Icon className="h-6 w-6" />
                     </div>
                     {title}
                 </div>
             </AccordionTrigger>
             <AccordionContent>
-                <div className="divide-y divide-border pl-4 pr-2">
+                <div className="divide-y divide-emerald-500/5 pb-4">
                     {children}
                 </div>
             </AccordionContent>
@@ -160,11 +157,9 @@ function PointCategory({ value, title, icon: Icon, children }: { value: string, 
 
 function PointDetail({ label, value }: { label: string, value: number }) {
     return (
-        <div className="flex justify-between items-center py-3">
-            <p className="text-muted-foreground">{label}</p>
-            <p className="font-bold text-lg text-primary">+{value}</p>
+        <div className="flex justify-between items-center py-4">
+            <p className="text-muted-foreground font-medium">{label}</p>
+            <p className="font-black text-xl text-emerald-600">+{value} PTS</p>
         </div>
     );
 }
-
-    

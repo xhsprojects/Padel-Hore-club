@@ -3,7 +3,6 @@ import { useParams, notFound, useRouter } from 'next/navigation';
 import { useFirebase, useDoc, useMemoFirebase, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { Product, WithId, ProductStatus } from '@/lib/types';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, ArrowLeft, ShoppingCart, Clock, LogIn, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -36,34 +35,32 @@ export default function ProductDetailPage() {
 
     if (isLoading || isUserLoading) {
         return (
-            <SidebarInset>
-                <div className="p-2 sm:p-6 lg:p-8">
-                     <div className="max-w-4xl mx-auto">
-                        <Skeleton className="h-10 w-48 mb-4" />
-                        <Card className="overflow-hidden">
-                            <div className="grid md:grid-cols-2">
-                                <Skeleton className="h-full aspect-square w-full" />
-                                <div className="flex flex-col">
-                                    <CardHeader>
-                                        <Skeleton className="h-6 w-28" />
-                                        <Skeleton className="h-9 w-3/4 pt-2" />
-                                        <Skeleton className="h-8 w-1/2 pt-1" />
-                                    </CardHeader>
-                                    <CardContent className="flex-grow space-y-6">
-                                        <div className="space-y-2">
-                                            <Skeleton className="h-5 w-24" />
-                                            <Skeleton className="h-20 w-full" />
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter>
-                                        <Skeleton className="h-12 w-full" />
-                                    </CardFooter>
-                                </div>
+            <div className="p-2 sm:p-6 lg:p-8">
+                 <div className="max-w-4xl mx-auto">
+                    <Skeleton className="h-10 w-48 mb-4" />
+                    <Card className="overflow-hidden">
+                        <div className="grid md:grid-cols-2">
+                            <Skeleton className="h-full aspect-square w-full" />
+                            <div className="flex flex-col">
+                                <CardHeader>
+                                    <Skeleton className="h-6 w-28" />
+                                    <Skeleton className="h-9 w-3/4 pt-2" />
+                                    <Skeleton className="h-8 w-1/2 pt-1" />
+                                </CardHeader>
+                                <CardContent className="flex-grow space-y-6">
+                                    <div className="space-y-2">
+                                        <Skeleton className="h-5 w-24" />
+                                        <Skeleton className="h-20 w-full" />
+                                    </div>
+                                </CardContent>
+                                <CardFooter>
+                                    <Skeleton className="h-12 w-full" />
+                                </CardFooter>
                             </div>
-                        </Card>
-                    </div>
+                        </div>
+                    </Card>
                 </div>
-            </SidebarInset>
+            </div>
         );
     }
     
@@ -109,64 +106,62 @@ export default function ProductDetailPage() {
     }
 
     return (
-         <SidebarInset>
-            <div className="p-2 sm:p-6 lg:p-8">
-                <div className="max-w-4xl mx-auto">
-                    <Button variant="outline" onClick={() => router.back()} className="mb-4">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Shop
-                    </Button>
-                    <Card className="overflow-hidden">
-                        <div className="grid md:grid-cols-2">
-                             <div className="bg-muted p-4">
-                                {product.imageUrls && product.imageUrls.length > 0 ? (
-                                    <Carousel className="w-full">
-                                        <CarouselContent>
-                                            {product.imageUrls.map((url, index) => (
-                                                <CarouselItem key={index}>
-                                                    <div className="relative aspect-square">
-                                                        <Image src={url} alt={`${product.name} image ${index + 1}`} fill className="object-contain rounded-md" />
-                                                    </div>
-                                                </CarouselItem>
-                                            ))}
-                                        </CarouselContent>
-                                        <CarouselPrevious />
-                                        <CarouselNext />
-                                    </Carousel>
-                                ) : (
-                                    <div className="flex h-full aspect-square w-full items-center justify-center bg-muted rounded-md">
-                                        <Package className="h-32 w-32 text-muted-foreground/30" />
+        <div className="p-2 sm:p-6 lg:p-8">
+            <div className="max-w-4xl mx-auto">
+                <Button variant="outline" onClick={() => router.back()} className="mb-4">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Shop
+                </Button>
+                <Card className="overflow-hidden">
+                    <div className="grid md:grid-cols-2">
+                         <div className="bg-muted p-4">
+                            {product.imageUrls && product.imageUrls.length > 0 ? (
+                                <Carousel className="w-full">
+                                    <CarouselContent>
+                                        {product.imageUrls.map((url, index) => (
+                                            <CarouselItem key={index}>
+                                                <div className="relative aspect-square">
+                                                    <Image src={url} alt={`${product.name} image ${index + 1}`} fill className="object-contain rounded-md" />
+                                                </div>
+                                            </CarouselItem>
+                                        ))}
+                                    </CarouselContent>
+                                    <CarouselPrevious />
+                                    <CarouselNext />
+                                </Carousel>
+                            ) : (
+                                <div className="flex h-full aspect-square w-full items-center justify-center bg-muted rounded-md">
+                                    <Package className="h-32 w-32 text-muted-foreground/30" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex flex-col">
+                            <CardHeader>
+                                <Badge className={cn("w-fit", details.className)}>{details.label}</Badge>
+                                <CardTitle className="font-headline text-3xl pt-2">{product.name}</CardTitle>
+                                <CardDescription className="font-bold text-2xl text-primary pt-1">
+                                    Rp {product.price.toLocaleString('id-ID')}
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="flex-grow space-y-6">
+                                <div className="space-y-2">
+                                    <h4 className="font-semibold">Deskripsi</h4>
+                                    <p className="text-muted-foreground whitespace-pre-wrap">{product.description}</p>
+                                </div>
+                                 {product.status === 'pre-order' && product.poEstimate && (
+                                    <div className="flex items-center gap-2 text-sm text-blue-400">
+                                        <Clock className="h-4 w-4" />
+                                        <span>Estimasi Pre-Order: {product.poEstimate}</span>
                                     </div>
                                 )}
-                            </div>
-                            <div className="flex flex-col">
-                                <CardHeader>
-                                    <Badge className={cn("w-fit", details.className)}>{details.label}</Badge>
-                                    <CardTitle className="font-headline text-3xl pt-2">{product.name}</CardTitle>
-                                    <CardDescription className="font-bold text-2xl text-primary pt-1">
-                                        Rp {product.price.toLocaleString('id-ID')}
-                                    </CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex-grow space-y-6">
-                                    <div className="space-y-2">
-                                        <h4 className="font-semibold">Deskripsi</h4>
-                                        <p className="text-muted-foreground whitespace-pre-wrap">{product.description}</p>
-                                    </div>
-                                     {product.status === 'pre-order' && product.poEstimate && (
-                                        <div className="flex items-center gap-2 text-sm text-blue-400">
-                                            <Clock className="h-4 w-4" />
-                                            <span>Estimasi Pre-Order: {product.poEstimate}</span>
-                                        </div>
-                                    )}
-                                </CardContent>
-                                <CardFooter>
-                                    {renderOrderButton()}
-                                </CardFooter>
-                            </div>
+                            </CardContent>
+                            <CardFooter>
+                                {renderOrderButton()}
+                            </CardFooter>
                         </div>
-                    </Card>
-                </div>
+                    </div>
+                </Card>
             </div>
-        </SidebarInset>
+        </div>
     );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useUser, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
@@ -32,7 +31,6 @@ export default function ManageAppSettingsPage() {
 
     if (isUserLoading || isProfileLoading || !user) {
         return (
-            <SidebarInset>
                  <div className="p-2 sm:p-6 lg:p-8">
                     <Card className="max-w-2xl mx-auto">
                         <CardHeader>
@@ -44,14 +42,12 @@ export default function ManageAppSettingsPage() {
                         </CardContent>
                     </Card>
                 </div>
-            </SidebarInset>
         )
     }
 
     const isDefaultAdmin = user.uid === DEFAULT_ADMIN_UID;
     if (userProfile?.role !== 'admin' && !isDefaultAdmin) {
         return (
-            <SidebarInset>
                 <div className="p-2 sm:p-6 lg:p-8 text-center">
                     <Card className="max-w-md mx-auto">
                         <CardHeader>
@@ -63,12 +59,10 @@ export default function ManageAppSettingsPage() {
                         </CardContent>
                     </Card>
                 </div>
-            </SidebarInset>
         );
     }
 
     return (
-        <SidebarInset>
             <div className="p-2 sm:p-6 lg:p-8">
                 <Card className="max-w-2xl mx-auto">
                     <CardHeader>
@@ -80,7 +74,6 @@ export default function ManageAppSettingsPage() {
                     </CardContent>
                 </Card>
             </div>
-        </SidebarInset>
     )
 }
 

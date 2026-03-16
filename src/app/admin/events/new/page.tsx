@@ -1,6 +1,5 @@
 'use client';
 
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -390,7 +389,6 @@ function CreateEventForm() {
 
 export default function NewEventPage() {
     return (
-        <SidebarInset>
             <div className="p-2 sm:p-6 lg:p-8">
                 <div className="max-w-2xl mx-auto">
                      <Button asChild variant="outline" className="mb-4">
@@ -412,6 +410,5 @@ export default function NewEventPage() {
                     </Card>
                 </div>
             </div>
-        </SidebarInset>
     );
 }

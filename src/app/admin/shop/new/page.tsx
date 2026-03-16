@@ -1,6 +1,5 @@
 'use client';
 
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ProductForm } from '@/components/admin/product-form';
 import { ArrowLeft } from 'lucide-react';
@@ -9,7 +8,6 @@ import { Button } from '@/components/ui/button';
 
 export default function NewProductPage() {
     return (
-        <SidebarInset>
             <div className="p-2 sm:p-6 lg:p-8">
                 <div className="max-w-2xl mx-auto">
                     <Button asChild variant="outline" className="mb-4">
@@ -29,6 +27,5 @@ export default function NewProductPage() {
                     </Card>
                 </div>
             </div>
-        </SidebarInset>
     );
 }

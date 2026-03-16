@@ -11,7 +11,6 @@ import { Loader2, Download, Share2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ImageGenerator } from '@/components/profile/image-generator';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getTier, capitalize } from '@/lib/utils';

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { useFirebase, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy, doc, writeBatch, updateDoc, deleteDoc } from 'firebase/firestore';
 import type { Notification, WithId } from '@/lib/types';
@@ -109,75 +108,62 @@ export default function NotificationsPage() {
 
     if (isUserLoading || !user) {
         return (
-            <SidebarInset>
-                <div className="p-4 sm:p-6 lg:p-8">
-                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                        <Skeleton className="h-10 w-64" />
-                        <div className="flex items-center gap-4 w-full sm:w-auto">
-                            <Skeleton className="h-10 w-40" />
-                            <Skeleton className="h-10 w-40" />
-                        </div>
-                    </div>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Skeleton className="h-24 w-full" />
-                        <Skeleton className="h-24 w-full" />
-                        <Skeleton className="h-24 w-full" />
-                        <Skeleton className="h-24 w-full" />
+            <div className="p-4 sm:p-6 lg:p-8">
+                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <Skeleton className="h-10 w-64" />
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                        <Skeleton className="h-10 w-40" />
+                        <Skeleton className="h-10 w-40" />
                     </div>
                 </div>
-            </SidebarInset>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                </div>
+            </div>
         );
     }
 
     return (
-        <SidebarInset>
-            <div className="p-4 sm:p-6 lg:p-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                    <h1 className="font-black text-3xl uppercase tracking-widest">Notifications</h1>
-                    <div className="flex items-center gap-4 w-full sm:w-auto">
-                        <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread')} className="w-full sm:w-auto">
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="all" className="text-sm">All</TabsTrigger>
-                                <TabsTrigger value="unread" className="text-sm">Unread</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                        <Button variant="outline" onClick={handleMarkAllAsRead} className="w-full sm:w-auto">Mark all as read</Button>
-                    </div>
+        <div className="p-4 sm:p-6 lg:p-8">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <h1 className="font-black text-3xl uppercase tracking-widest">Notifications</h1>
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <Tabs value={filter} onValueChange={(v) => setFilter(v as 'all' | 'unread')} className="w-full sm:w-auto">
+                        <TabsList className="grid w-full grid-cols-2">
+                            <TabsTrigger value="all" className="text-sm">All</TabsTrigger>
+                            <TabsTrigger value="unread" className="text-sm">Unread</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                    <Button variant="outline" onClick={handleMarkAllAsRead} className="w-full sm:w-auto">Mark all as read</Button>
                 </div>
-
-                {isLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Skeleton className="h-24 w-full" />
-                        <Skeleton className="h-24 w-full" />
-                        <Skeleton className="h-24 w-full" />
-                        <Skeleton className="h-24 w-full" />
-                    </div>
-                ) : filteredNotifications && filteredNotifications.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {filteredNotifications.map(notif => (
-                            <NotificationItem 
-                                key={notif.id} 
-                                notification={notif} 
-                                onClick={() => handleNotificationClick(notif)}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <Card className="text-center p-12 text-muted-foreground bg-card/50">
-                        You have no {filter === 'unread' ? 'unread' : ''} notifications yet.
-                    </Card>
-                )}
             </div>
-            
-            <NotificationDetailModal 
-                notification={selectedNotification}
-                open={!!selectedNotification}
-                onOpenChange={(isOpen) => {
-                    if (!isOpen) setSelectedNotification(null);
-                }}
-                onDelete={handleDeleteNotification}
-            />
-        </SidebarInset>
+
+            {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                </div>
+            ) : filteredNotifications && filteredNotifications.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {filteredNotifications.map(notif => (
+                        <NotificationItem 
+                            key={notif.id} 
+                            notification={notif} 
+                            onClick={() => handleNotificationClick(notif)}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <Card className="text-center p-12 text-muted-foreground bg-card/50">
+                    You have no {filter === 'unread' ? 'unread' : ''} notifications yet.
+                </Card>
+            )}
+        </div>
     );
 }
 

@@ -2,7 +2,6 @@
 
 import { useSearchParams } from 'next/navigation';
 import React, { Suspense, useEffect } from 'react';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { MatchForm } from '@/components/admin/match-form';
 import { useCollection, useFirebase, useMemoFirebase, useUser, useDoc } from '@/firebase';
@@ -57,7 +56,6 @@ function AdminPageContents() {
 
     if (isUserLoading || isProfileLoading || playersLoading || !user) {
         return (
-            <SidebarInset>
                 <div className="p-2 sm:p-6 lg:p-8">
                      <Card className="max-w-4xl mx-auto bg-card">
                         <CardHeader className="text-center">
@@ -68,7 +66,6 @@ function AdminPageContents() {
                         </CardContent>
                     </Card>
                 </div>
-            </SidebarInset>
         )
     }
     
@@ -76,25 +73,11 @@ function AdminPageContents() {
     const isAdmin = userProfile?.role === 'admin' || isDefaultAdmin;
 
     if (!isAdmin) {
-        return (
-            <SidebarInset>
-                <div className="p-2 sm:p-6 lg:p-8 text-center">
-                    <Card className="max-w-md mx-auto">
-                        <CardHeader>
-                            <CardTitle>Access Denied</CardTitle>
-                            <CardDescription>You do not have the required permissions to view this page.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Button onClick={() => router.push('/')}>Go to Leaderboard</Button>
-                        </CardContent>
-                    </Card>
-                </div>
-            </SidebarInset>
-        );
+        router.push('/');
+        return null;
     }
 
     return (
-        <SidebarInset>
             <div className="p-2 sm:p-6 lg:p-8">
                 <Card className="max-w-4xl mx-auto bg-card">
                     <CardHeader className="text-center">
@@ -115,14 +98,12 @@ function AdminPageContents() {
                     </CardContent>
                 </Card>
             </div>
-        </SidebarInset>
     )
 }
 
 export default function AdminPage() {
     return (
         <Suspense fallback={
-            <SidebarInset>
                  <div className="p-2 sm:p-6 lg:p-8">
                      <Card className="max-w-4xl mx-auto bg-card">
                         <CardHeader className="text-center">
@@ -133,7 +114,6 @@ export default function AdminPage() {
                         </CardContent>
                     </Card>
                 </div>
-            </SidebarInset>
         }>
             <AdminPageContents />
         </Suspense>

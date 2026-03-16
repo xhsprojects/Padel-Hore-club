@@ -4,7 +4,6 @@ import { useParams, notFound, useRouter } from 'next/navigation';
 import { useFirebase, useDoc, useCollection, useMemoFirebase } from '@/firebase';
 import { doc, collection, query } from 'firebase/firestore';
 import type { Match, UserProfile, WithId, PointBreakdown } from '@/lib/types';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Calendar, MapPin, ArrowLeft, Trophy } from 'lucide-react';
@@ -42,33 +41,31 @@ export default function MatchDetailPage() {
 
     if (matchLoading || allPlayersLoading) {
         return (
-            <SidebarInset>
-                <div className="p-2 sm:p-6 lg:p-8">
-                    <div className="max-w-4xl mx-auto">
-                        <Skeleton className="h-10 w-36 mb-4" />
-                        <Card>
-                            <CardHeader>
-                                <div className="flex justify-between items-start gap-4">
-                                    <div>
-                                        <Skeleton className="h-8 w-48 mb-2" />
-                                        <Skeleton className="h-5 w-64" />
-                                    </div>
-                                    <div className="text-right flex-shrink-0">
-                                        <Skeleton className="h-5 w-24 ml-auto" />
-                                        <Skeleton className="h-10 w-28 ml-auto mt-1" />
-                                    </div>
+            <div className="p-2 sm:p-6 lg:p-8">
+                <div className="max-w-4xl mx-auto">
+                    <Skeleton className="h-10 w-36 mb-4" />
+                    <Card>
+                        <CardHeader>
+                            <div className="flex justify-between items-start gap-4">
+                                <div>
+                                    <Skeleton className="h-8 w-48 mb-2" />
+                                    <Skeleton className="h-5 w-64" />
                                 </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                                    <Skeleton className="h-64 w-full" />
-                                    <Skeleton className="h-64 w-full" />
+                                <div className="text-right flex-shrink-0">
+                                    <Skeleton className="h-5 w-24 ml-auto" />
+                                    <Skeleton className="h-10 w-28 ml-auto mt-1" />
                                 </div>
-                            </CardContent>
-                        </Card>
-                    </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                                <Skeleton className="h-64 w-full" />
+                                <Skeleton className="h-64 w-full" />
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
-            </SidebarInset>
+            </div>
         );
     }
     
@@ -80,49 +77,47 @@ export default function MatchDetailPage() {
     const team2Players = match.team_2.map(id => playersMap.get(id)).filter(Boolean) as WithId<UserProfile>[];
 
     return (
-        <SidebarInset>
-            <div className="p-2 sm:p-6 lg:p-8">
-                <div className="max-w-4xl mx-auto">
-                    <Button variant="outline" onClick={() => router.back()} className="mb-4">
-                        <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to History
-                    </Button>
-                    <Card>
-                        <CardHeader>
-                            <div className="flex justify-between items-start gap-4">
-                                <div>
-                                    <CardTitle className="font-headline text-2xl">Match Details</CardTitle>
-                                    <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
-                                        <div className="flex items-center gap-2"><Calendar className="h-4 w-4"/> {format(match.timestamp.toDate(), "eeee, dd MMMM yyyy")}</div>
-                                        {match.courtName && <div className="flex items-center gap-2"><MapPin className="h-4 w-4"/>{match.courtName} - {match.courtLocation}</div>}
-                                        {match.eventName && (
-                                            <div className="flex items-center gap-2">
-                                                <Trophy className="h-4 w-4"/>
-                                                Event: {match.eventName} {match.roundNumber && `(Round ${match.roundNumber})`}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="text-right flex-shrink-0">
-                                    <p className="text-sm text-muted-foreground">Final Score</p>
-                                    <p className="font-black text-3xl tracking-tight">
-                                        <span className={cn(match.winner_team === 'Team 1' && 'text-primary')}>{match.score_1}</span>
-                                        <span> - </span>
-                                        <span className={cn(match.winner_team === 'Team 2' && 'text-primary')}>{match.score_2}</span>
-                                    </p>
+        <div className="p-2 sm:p-6 lg:p-8">
+            <div className="max-w-4xl mx-auto">
+                <Button variant="outline" onClick={() => router.back()} className="mb-4">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to History
+                </Button>
+                <Card>
+                    <CardHeader>
+                        <div className="flex justify-between items-start gap-4">
+                            <div>
+                                <CardTitle className="font-headline text-2xl">Match Details</CardTitle>
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
+                                    <div className="flex items-center gap-2"><Calendar className="h-4 w-4"/> {format(match.timestamp.toDate(), "eeee, dd MMMM yyyy")}</div>
+                                    {match.courtName && <div className="flex items-center gap-2"><MapPin className="h-4 w-4"/>{match.courtName} - {match.courtLocation}</div>}
+                                    {match.eventName && (
+                                        <div className="flex items-center gap-2">
+                                            <Trophy className="h-4 w-4"/>
+                                            Event: {match.eventName} {match.roundNumber && `(Round ${match.roundNumber})`}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                                <TeamDetails teamName="Team 1" players={team1Players} isWinner={match.winner_team === 'Team 1'} pointBreakdown={match.point_breakdown} />
-                                <TeamDetails teamName="Team 2" players={team2Players} isWinner={match.winner_team === 'Team 2'} pointBreakdown={match.point_breakdown} />
+                            <div className="text-right flex-shrink-0">
+                                <p className="text-sm text-muted-foreground">Final Score</p>
+                                <p className="font-black text-3xl tracking-tight">
+                                    <span className={cn(match.winner_team === 'Team 1' && 'text-primary')}>{match.score_1}</span>
+                                    <span> - </span>
+                                    <span className={cn(match.winner_team === 'Team 2' && 'text-primary')}>{match.score_2}</span>
+                                </p>
                             </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                            <TeamDetails teamName="Team 1" players={team1Players} isWinner={match.winner_team === 'Team 1'} pointBreakdown={match.point_breakdown} />
+                            <TeamDetails teamName="Team 2" players={team2Players} isWinner={match.winner_team === 'Team 2'} pointBreakdown={match.point_breakdown} />
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
-        </SidebarInset>
+        </div>
     );
 }
 

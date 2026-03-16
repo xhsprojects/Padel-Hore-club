@@ -2,7 +2,6 @@
 
 import { useUser, useDoc, useFirebase, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { SidebarInset } from '@/components/ui/sidebar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { User as UserIcon, ShieldCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

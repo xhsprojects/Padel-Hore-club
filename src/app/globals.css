@@ -89,6 +89,27 @@ body {
         border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
+    .glass-card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .rank-card-1 {
+        background: linear-gradient(180deg, rgba(16, 185, 129, 0.1) 0%, rgba(209, 250, 229, 0.4) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    .rank-card-2 {
+        background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(209, 250, 229, 0.3) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+    
+    .rank-card-3 {
+        background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, rgba(209, 250, 229, 0.3) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
     .podium-card {
         background: radial-gradient(circle at top right, hsl(145 40% 94%), hsl(140 30% 88%));
         @apply shadow-sm border border-emerald-500/20;

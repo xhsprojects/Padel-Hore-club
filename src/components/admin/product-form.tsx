@@ -118,8 +118,8 @@ export function ProductForm({ productToEdit }: ProductFormProps) {
         const fileId = uuidv4();
         const docId = productToEdit?.id || doc(collection(firestore, 'products')).id;
         const newStorageRef = ref(storage, `products/${docId}/${fileId}`);
-        return uploadBytesResumable(newStorageRef, file).then(uploadTask => getDownloadURL(uploadTask.ref));
-      });
+        return uploadBytesResumable(newStorageRef, file).then(uploadTask => getDownloadURL(uploadTask.ref) as Promise<string>);
+      }) as Promise<string>[];
 
       const newImageUrls: string[] = await Promise.all(uploadPromises);
       finalImageUrls = [...finalImageUrls, ...newImageUrls];
