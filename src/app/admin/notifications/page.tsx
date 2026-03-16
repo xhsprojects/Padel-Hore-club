@@ -99,12 +99,12 @@ export default function AdminNotificationsPage() {
 
             usersSnapshot.forEach((userDoc) => {
                 const member = userDoc.data() as UserProfile;
-                const targetUid = userDoc.id; // Correct way to get the UID from document
+                const targetUid = userDoc.id; 
                 
-                if (targetUid === auth.currentUser?.uid) return;
+                if (!targetUid || targetUid === auth.currentUser?.uid) return;
 
                 // Add in-app notification to batch
-                const notifRef = doc(collection(firestore, 'users', targetUid, 'notifications'));
+                const notifRef = doc(firestore, 'users', targetUid, 'notifications', doc(collection(firestore, 'users', targetUid, 'notifications')).id);
                 batch.set(notifRef, {
                     uid: targetUid,
                     title: data.title,
@@ -118,12 +118,17 @@ export default function AdminNotificationsPage() {
 
                 // Collect FCM tokens for push notification
                 if (member.fcmTokens && Array.isArray(member.fcmTokens)) {
-                    fcmTokens.push(...member.fcmTokens);
+                    // Filter to ensure only valid non-empty strings are sent
+                    const validTokens = member.fcmTokens.filter(t => t && typeof t === 'string' && t.trim().length > 0);
+                    fcmTokens.push(...validTokens);
                 }
                 count++;
             });
 
             await batch.commit();
+
+            let pushDetails = "No push tokens found.";
+            let success = true;
 
             // Send push notifications
             if (fcmTokens.length > 0) {
@@ -134,16 +139,18 @@ export default function AdminNotificationsPage() {
                 });
 
                 if (pushResult.success) {
-                    toast({ 
-                        title: 'Push Sent', 
-                        description: `Success: ${pushResult.successCount}, Failure: ${pushResult.failureCount}${pushResult.errors && pushResult.errors.length > 0 ? '\nErrors: ' + pushResult.errors.join(', ') : ''}` 
-                    });
+                    pushDetails = `Push Sent: ${pushResult.successCount} ok, ${pushResult.failureCount} failed.`;
                 } else {
-                    toast({ variant: 'destructive', title: 'Push Failed', description: pushResult.error });
+                    pushDetails = `Push Error: ${pushResult.error}`;
+                    success = false;
                 }
             }
 
-            toast({ title: 'Success!', description: `In-app notifications sent to ${count} users.` });
+            toast({ 
+                variant: success ? 'default' : 'destructive',
+                title: success ? 'Notifications Sent!' : 'Partial Success', 
+                description: `In-app: ${count} users. ${pushDetails}` 
+            });
             form.reset();
 
         } catch (err) {
