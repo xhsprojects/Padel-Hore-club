@@ -15,20 +15,35 @@ const VAPID_KEY = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
  * @param firestore A Firestore instance.
  */
 export async function requestNotificationPermission(uid: string, firestore: Firestore) {
+  if (typeof window === 'undefined') return;
+
   const supported = await isSupported();
   if (!supported) {
     console.log("Firebase Messaging is not supported in this browser.");
     return;
   }
 
-  console.log('Requesting notification permission...');
-  const permission = await Notification.requestPermission();
+  try {
+    // Explicitly register the service worker to help iOS/PWA environments find it
+    if ('serviceWorker' in navigator) {
+      console.log('Registering service worker for messaging...');
+      await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+        scope: '/'
+      });
+      console.log('Service worker for messaging registered successfully.');
+    }
 
-  if (permission === 'granted') {
-    console.log('Notification permission granted.');
-    await saveMessagingDeviceToken(uid, firestore);
-  } else {
-    console.log('Unable to get permission to notify.');
+    console.log('Requesting notification permission...');
+    const permission = await Notification.requestPermission();
+  
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+      await saveMessagingDeviceToken(uid, firestore);
+    } else {
+      console.log('Unable to get permission to notify.');
+    }
+  } catch (err) {
+    console.error('Error during notification permission request:', err);
   }
 }
 
@@ -44,8 +59,14 @@ async function saveMessagingDeviceToken(uid: string, firestore: Firestore) {
         return;
     }
     const messaging = getMessaging(getApp());
-    console.log('Attempting to get FCM token with VAPID key starting with:', VAPID_KEY.substring(0, 10) + '...');
-    const fcmToken = await getToken(messaging, { vapidKey: VAPID_KEY });
+    console.log('Attempting to get FCM token with VAPID key...');
+    
+    // Explicitly get the registration to pass to getToken
+    const registration = await navigator.serviceWorker.ready;
+    const fcmToken = await getToken(messaging, { 
+        vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: registration
+    });
     
     if (fcmToken) {
       console.log('FCM Token retrieved successfully:', fcmToken);
