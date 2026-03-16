@@ -84,7 +84,7 @@ export default function PlayerProfilePage() {
     if (!firestore) return null;
     return query(collection(firestore, 'seasons'), where('isActive', '==', true));
   }, [firestore]);
-  const { data: activeSeasons, isLoading: seasonsLoading } = useCollection<WithId<Season>>(activeSeasonsQuery);
+  const { data: activeSeasons, isLoading: seasonsLoading } = useCollection<WithId<Season>>(seasonsQuery);
   const activeSeason = activeSeasons?.[0];
 
   const { seasonStats, lifetimeStats } = React.useMemo(() => {

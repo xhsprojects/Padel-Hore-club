@@ -57,13 +57,12 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
-        Dropdown: ({ value, onChange, children, ...props }: DropdownProps) => {
-          const options = React.Children.toArray(
-            children
-          ) as React.ReactElement<React.HTMLProps<HTMLOptionElement>>[]
-          const selected = options.find((child) => child.props.value === value)
+        Chevron: ({ orientation, ...props }) => {
+          const Icon = orientation === 'left' ? ChevronLeft : ChevronRight;
+          return <Icon className="h-4 w-4" {...props} />;
+        },
+        Dropdown: ({ value, onChange, options, ...props }) => {
+          const selected = options?.find((option) => option.value === value)
           const handleChange = (value: string) => {
             const changeEvent = {
               target: { value },
@@ -78,16 +77,16 @@ function Calendar({
               }}
             >
               <SelectTrigger className="h-7 text-sm px-2 border-0 bg-transparent focus:ring-0 focus:ring-offset-0">
-                <SelectValue>{selected?.props?.children}</SelectValue>
+                <SelectValue>{selected?.label}</SelectValue>
               </SelectTrigger>
               <SelectContent position="popper">
                 <ScrollArea className="h-80">
-                  {options.map((option, id: number) => (
+                  {options?.map((option, id: number) => (
                     <SelectItem
-                      key={`${option.props.value}-${id}`}
-                      value={option.props.value?.toString() ?? ""}
+                      key={`${option.value}-${id}`}
+                      value={option.value?.toString() ?? ""}
                     >
-                      {option.props.children}
+                      {option.label}
                     </SelectItem>
                   ))}
                 </ScrollArea>

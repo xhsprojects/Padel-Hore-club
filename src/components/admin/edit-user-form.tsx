@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Terminal, UserCog, Star, Hourglass, Eye, EyeOff } from 'lucide-react';
 import { useFirebase } from '@/firebase';
 import type { UserProfile, WithId } from '@/lib/types';
@@ -62,7 +62,7 @@ export function EditUserForm({ user, setOpen }: EditUserFormProps) {
         defaultValues: {
             name: user.name,
             whatsapp: user.whatsapp || '',
-            role: user.role,
+            role: user.role as FormValues['role'],
             membershipExpiryDate: user.membershipExpiryDate ? format(user.membershipExpiryDate.toDate(), 'yyyy-MM-dd') : '',
             isUnlimitedMember: user.isUnlimitedMember || false,
         },

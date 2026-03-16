@@ -228,7 +228,7 @@ export function EditMatchForm({ match, allPlayers, setOpen }: EditMatchFormProps
 
             player.total_points += Math.round(totalPointsForMatch);
             player.match_count += 1;
-            if (isWinner && winnerTeam !== 'Draw') player.win_count += 1;
+            if (isWinner) player.win_count += 1;
             player.tier = getTier(player.total_points, thresholds);
             // Ignoring win_streak update in edit for simplicity
         }
@@ -412,7 +412,7 @@ const PlayerSelectionSlot = ({ form, players, fieldName }: { form: any, players:
     
     // In edit form, all players are technically "selected" initially, so we adjust the filter logic
     const allSelectedOnForm = form.watch(['team1_player1', 'team1_player2', 'team2_player1', 'team2_player2']);
-    const otherSelectedIds = allSelectedOnForm.filter(id => id !== selectedPlayerId);
+    const otherSelectedIds = allSelectedOnForm.filter((id: string) => id !== selectedPlayerId);
 
 
     const handleSelect = (playerId: string) => {
@@ -507,7 +507,7 @@ const BonusCheckboxes = ({ form, players, fieldName, label, icon: Icon }: { form
                                                 onCheckedChange={(checked) => {
                                                     return checked
                                                         ? field.onChange([...(field.value || []), player.id])
-                                                        : field.onChange(field.value?.filter((value) => value !== player.id));
+                                                        : field.onChange(field.value?.filter((value: string) => value !== player.id));
                                                 }}
                                             />
                                         </FormControl>

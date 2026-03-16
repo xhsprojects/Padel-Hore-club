@@ -357,7 +357,7 @@ export function MatchForm({ allPlayers, prefilledPlayerIds, prefillOnTime, event
             if (data.slotFillerPlayers.includes(player.id)) breakdown.slot_filler += POINT_RULES.BEHAVIOR.SLOT_FILLER;
             
             let newWinStreak = player.win_streak || 0;
-            if (isWinner && winner_team !== 'Draw') {
+            if (isWinner) {
                 newWinStreak++;
             } else {
                 newWinStreak = 0;
@@ -375,7 +375,7 @@ export function MatchForm({ allPlayers, prefilledPlayerIds, prefillOnTime, event
             
             updates.total_points = newTotalPoints;
             updates.match_count = player.match_count + 1;
-            updates.win_count = (isWinner && winner_team !== 'Draw') ? player.win_count + 1 : player.win_count;
+            updates.win_count = isWinner ? player.win_count + 1 : player.win_count;
             updates.win_streak = newWinStreak;
             updates.tier = newTier;
 

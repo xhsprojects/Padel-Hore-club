@@ -19,7 +19,7 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <SidebarMenuButton
-          variant="ghost"
+          variant="outline"
           className="w-full justify-start group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:justify-center"
           tooltip={{ children: 'Toggle theme' }}
         >
