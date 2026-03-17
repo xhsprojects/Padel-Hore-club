@@ -4,38 +4,45 @@
 import * as admin from 'firebase-admin';
 import { Message } from 'firebase-admin/messaging';
 
-// Helper to initialize the admin app safely
-function getAdminApp() {
+// Helper to initialize the admin app safely and return status
+function getAdminAppWithStatus() {
+  const status: string[] = [];
+  
   if (admin.apps.length > 0) {
-    return admin.apps[0] as admin.app.App;
+    status.push(`App already initialized (${admin.apps.length} apps)`);
+    return { app: admin.apps[0] as admin.app.App, status: status.join('; ') };
   }
 
   const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
   if (serviceAccountKey) {
+    status.push(`Key found (len: ${serviceAccountKey.length})`);
     try {
-      // Normal parse
       let parsed = JSON.parse(serviceAccountKey);
-      
-      // If result is still a string (double-encoded), parse again
       if (typeof parsed === 'string') {
+        status.push("Double-encoded string detected, parsing again");
         parsed = JSON.parse(parsed);
       }
 
       if (parsed.project_id && parsed.private_key) {
-        console.log("FCM: Initializing with Service Account for project:", parsed.project_id);
-        return admin.initializeApp({
+        status.push(`Credentials valid for: ${parsed.project_id}`);
+        const app = admin.initializeApp({
           credential: admin.credential.cert(parsed),
           projectId: parsed.project_id
         });
+        return { app, status: status.join('; ') };
+      } else {
+        status.push("JSON missing project_id or private_key");
       }
     } catch (e) {
-      console.warn("FCM: FIREBASE_SERVICE_ACCOUNT_KEY parse failed:", (e as Error).message);
+      status.push(`Parse error: ${(e as Error).message}`);
     }
+  } else {
+    status.push("FIREBASE_SERVICE_ACCOUNT_KEY not found in process.env");
   }
 
-  console.warn("FCM: Falling back to Application Default Credentials.");
-  return admin.initializeApp();
+  status.push("Falling back to ADC");
+  return { app: admin.initializeApp(), status: status.join('; ') };
 }
 
 interface NotificationPayload {
@@ -46,13 +53,14 @@ interface NotificationPayload {
 }
 
 export async function sendPushNotification(tokens: string[], payload: NotificationPayload) {
+  let initStatus = "unknown";
   try {
     if (!tokens || tokens.length === 0) {
-      console.log("No FCM tokens provided. Skipping push notification.");
-      return { success: true, message: "No tokens to send to." };
+        return { success: true, message: "No tokens to send to." };
     }
   
-    const app = getAdminApp();
+    const { app, status } = getAdminAppWithStatus();
+    initStatus = status;
     const messaging = app.messaging();
 
     const message = {
@@ -70,17 +78,14 @@ export async function sendPushNotification(tokens: string[], payload: Notificati
       },
     };
     
-    // @ts-ignore - MulticastMessage type is slightly different but compatible
+    // @ts-ignore
     const response = await messaging.sendEachForMulticast({ tokens, ...message });
     
-    console.log(`Successfully sent ${response.successCount} push notifications.`);
     const errorDetails: string[] = [];
     if (response.failureCount > 0) {
-      console.error(`Failed to send ${response.failureCount} push notifications.`);
       response.responses.forEach((resp, idx) => {
         if (!resp.success) {
           const errMsg = `Token ${idx}: ${resp.error?.message || 'Unknown error'}`;
-          console.error(`- ${errMsg}`);
           errorDetails.push(errMsg);
         }
       });
@@ -89,10 +94,15 @@ export async function sendPushNotification(tokens: string[], payload: Notificati
       success: true, 
       successCount: response.successCount, 
       failureCount: response.failureCount,
-      errors: errorDetails
+      errors: errorDetails,
+      initStatus 
     };
   } catch (error) {
     console.error('Error sending push notification:', error);
-    return { success: false, error: (error as Error).message };
+    return { 
+        success: false, 
+        error: (error as Error).message,
+        initStatus 
+    };
   }
 }
