@@ -15,30 +15,53 @@ function parseServiceAccount(key: string): any {
     s = s.slice(1, -1);
   }
 
-  // 2. Unescape common JSON character escapes that might be literally preserved
-  // This handles the "Bad escaped character" error by cleaning up \M, \P etc.
-  // which often happen if someone pastes a key and it gets double-escaped or partially escaped.
-  
-  // If the string contains literal \" but is NOT valid JSON, we fix the quotes
+  // 2. Normalize some obvious issues
   if (s.includes('\\"')) {
     s = s.replace(/\\"/g, '"');
   }
+  s = s.replace(/\\\\n/g, '\\n');
 
-  // Handle literal backslashes for newlines in the private key
-  s = s.replace(/\\\\n/g, '\\n'); // Convert \\\\n to \\n for JSON.parse
-  
-  // Try to parse. If it fails due to illegal escapes, we take more drastic measures.
+  // 3. Try standard parse
   try {
-    return JSON.parse(s);
+    const parsed = JSON.parse(s);
+    if (parsed && typeof parsed === 'object') return parsed;
   } catch (e) {
-    // Drastic: replace all single backslashes that aren't followed by valid escape chars
-    // This is risky but often necessary for "garbage" string inputs
-    const cleaned = s.replace(/\\([^"\\\/bfnrtu])/g, '$1');
-    try {
-      return JSON.parse(cleaned);
-    } catch (e2) {
-      throw new Error(`Invalid JSON: ${(e as Error).message}`);
+    // 4. NUCLEAR OPTION: Regex extraction
+    // If JSON.parse fails, we extract what we need directly.
+    console.log("AdminNotif: JSON.parse failed, attempting nuclear regex extraction");
+    
+    // Helper to extract a value based on a key
+    const extract = (raw: string, field: string) => {
+      // Look for "field": "value" or \"field\": \"value\"
+      const regex = new RegExp(`[\\\\"]*${field}[\\\\"]*\\s*:\\s*[\\\\"]*([^\\\\"]+)[\\\\"]*`);
+      const match = raw.match(regex);
+      return match ? match[1] : null;
+    };
+
+    // Special regex for private_key since it's long and has newlines
+    const extractPrivateKey = (raw: string) => {
+        const match = raw.match(/[\\"]*private_key[\\"]*\s*:\s*[\\"]*([^"\\]+(?:\\n[^"\\]+)*)[\\"]*/);
+        if (match) {
+            // Unescape the literal \n strings back into real newlines for the cert
+            return match[1].replace(/\\n/g, '\n');
+        }
+        return null;
+    };
+
+    const project_id = extract(s, 'project_id');
+    const client_email = extract(s, 'client_email');
+    const private_key = extractPrivateKey(s);
+
+    if (project_id && private_key && client_email) {
+      return {
+        type: "service_account",
+        project_id,
+        private_key,
+        client_email,
+      };
     }
+    
+    throw new Error(`Nuclear extraction failed. JSON Error: ${(e as Error).message}`);
   }
 }
 
