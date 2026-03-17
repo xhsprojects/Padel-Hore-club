@@ -21,9 +21,9 @@ export const metadata: Metadata = {
     title: 'Padel Hore',
   },
   icons: {
-    icon: '/logopadel.png',
-    shortcut: '/logopadel.png',
-    apple: '/logopadel.png',
+    icon: '/logopadelapp.png',
+    shortcut: '/logopadelapp.png',
+    apple: '/logopadelapp.png',
   },
 };
 

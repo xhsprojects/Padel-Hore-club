@@ -172,7 +172,7 @@ export function LeaderboardClient() {
                             </div>
                             <div className="text-center w-full px-1">
                                 <p className={cn(
-                                    "font-bold px-1 text-emerald-950",
+                                    "font-bold px-1 text-emerald-950 mx-auto",
                                     isRank1 
                                         ? "text-sm truncate md:whitespace-normal max-w-[100px] md:max-w-none" 
                                         : "text-xs truncate md:whitespace-normal max-w-[80px] md:max-w-none"
