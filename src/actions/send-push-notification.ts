@@ -11,6 +11,7 @@ function parseServiceAccount(key: string): any {
   let s = key.trim();
   
   // 1. Try to extract basic fields directly using regex (most resilient)
+  // This bypasses JSON.parse bugs when the string is escaped by Vercel/pasted badly.
   const project_id_match = s.match(/[\\"]*project_id[\\"]*\s*:\s*[\\"]*([^\\",\s}]+)[\\"]*/);
   const client_email_match = s.match(/[\\"]*client_email[\\"]*\s*:\s*[\\"]*([^\\",\s}]+)[\\"]*/);
   const private_key_match = s.match(/-----BEGIN PRIVATE KEY-----[\s\S]*?-----END PRIVATE KEY-----/);
@@ -20,9 +21,12 @@ function parseServiceAccount(key: string): any {
     const client_email = client_email_match[1];
     let private_key = private_key_match[0];
     
-    // Crucial: PEM keys MUST have actual newlines. 
-    // We replace literal \n strings with real newline characters.
-    private_key = private_key.replace(/\\n/g, '\n');
+    // Crucial: Pem keys from Vercel env often have escaped newlines.
+    // We need to normalize \n or \\n into actual newlines.
+    private_key = private_key
+      .replace(/\\n/g, '\n')
+      .replace(/\\+/g, '\\') // Fix accidental double+ backslashes
+      .replace(/\\n/g, '\n'); // Second pass for double escaped
     
     return {
       type: "service_account",
@@ -32,7 +36,7 @@ function parseServiceAccount(key: string): any {
     };
   }
 
-  // 2. Fallback to JSON.parse if regex fails (shouldn't happen for valid keys)
+  // 2. Fallback to standard cleaning + parsing
   try {
     const cleaned = s.replace(/\\"/g, '"').replace(/\\\\n/g, '\\n');
     const parsed = JSON.parse(cleaned);

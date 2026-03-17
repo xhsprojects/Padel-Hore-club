@@ -1,4 +1,3 @@
-
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -69,10 +68,10 @@ export default function RootLayout({
                   </SidebarInset>
                 </div>
 
-                <Toaster />
               </SidebarProvider>
             </MaintenanceProvider>
           </FirebaseClientProvider>
+          <Toaster />
           <PwaInstallPrompt />
       </body>
     </html>
