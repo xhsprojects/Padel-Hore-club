@@ -12,21 +12,25 @@ function parseServiceAccount(key: string): any {
   
   // 1. Try to extract basic fields directly using regex (most resilient)
   // This bypasses JSON.parse bugs when the string is escaped by Vercel/pasted badly.
-  const project_id_match = s.match(/[\\"]*project_id[\\"]*\s*:\s*[\\"]*([^\\",\s}]+)[\\"]*/);
-  const client_email_match = s.match(/[\\"]*client_email[\\"]*\s*:\s*[\\"]*([^\\",\s}]+)[\\"]*/);
+  const extractField = (field: string) => {
+    const regex = new RegExp(`[\\\\"]*${field}[\\\\"]*\\s*:\\s*[\\\\"]*([^\\\\",\\s}]+?)[\\\\"]*[,}]`);
+    const match = s.match(regex);
+    return match ? match[1].replace(/\\/g, '') : null;
+  };
+
+  const project_id = extractField('project_id');
+  const client_email = extractField('client_email');
   const private_key_match = s.match(/-----BEGIN PRIVATE KEY-----[\s\S]*?-----END PRIVATE KEY-----/);
 
-  if (project_id_match && client_email_match && private_key_match) {
-    const project_id = project_id_match[1];
-    const client_email = client_email_match[1];
+  if (project_id && client_email && private_key_match) {
     let private_key = private_key_match[0];
     
-    // Crucial: Pem keys from Vercel env often have escaped newlines.
-    // We need to normalize \n or \\n into actual newlines.
-    private_key = private_key
-      .replace(/\\n/g, '\n')
-      .replace(/\\+/g, '\\') // Fix accidental double+ backslashes
-      .replace(/\\n/g, '\n'); // Second pass for double escaped
+    // PEM keys MUST have actual newlines.
+    // 1. Normalize all variations of escaped newlines to actual newlines
+    private_key = private_key.replace(/\\+n/g, '\n'); 
+    
+    // 2. Remove any other illegal backslashes that might have been introduced during escaping
+    private_key = private_key.replace(/[^A-Za-z0-9+/=\-\n\s]/g, '');
     
     return {
       type: "service_account",
@@ -36,13 +40,13 @@ function parseServiceAccount(key: string): any {
     };
   }
 
-  // 2. Fallback to standard cleaning + parsing
+  // 2. Fallback to standard cleaning + parsing if regex fails
   try {
     const cleaned = s.replace(/\\"/g, '"').replace(/\\\\n/g, '\\n');
     const parsed = JSON.parse(cleaned);
     if (parsed && typeof parsed === 'object') {
        if (parsed.private_key) {
-         parsed.private_key = parsed.private_key.replace(/\\n/g, '\n');
+         parsed.private_key = parsed.private_key.replace(/\\n/g, '\n').replace(/\\+/g, '\\').replace(/\\n/g, '\n');
        }
        return parsed;
     }
