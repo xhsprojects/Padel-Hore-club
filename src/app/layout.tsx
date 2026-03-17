@@ -1,3 +1,4 @@
+
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -71,6 +72,7 @@ export default function RootLayout({
               </SidebarProvider>
             </MaintenanceProvider>
           </FirebaseClientProvider>
+          {/* Important: Place Toaster at root for maximum visibility */}
           <Toaster />
           <PwaInstallPrompt />
       </body>
