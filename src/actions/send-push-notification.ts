@@ -19,7 +19,8 @@ function parseServiceAccount(key: string): any {
     // If direct parse fails, it might be literally escaped e.g. {\"type\":...}
     // We try to unescape it
     if (s.includes('\\"')) {
-      s = s.replace(/\\"/g, '"').replace(/\\n/g, '\n');
+      s = s.replace(/\\"/g, '"');
+      // DO NOT replace \\n with \n here, as JSON.parse expects escaped newlines (\n) inside strings
     }
     // Remove outer quotes if it was entered as a quoted string literal
     if (s.startsWith('"') && s.endsWith('"')) {
