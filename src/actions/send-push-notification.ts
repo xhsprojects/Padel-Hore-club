@@ -4,35 +4,41 @@
 import * as admin from 'firebase-admin';
 import { Message } from 'firebase-admin/messaging';
 
-// Helper to clean and parse JSON that might be escaped or double-quoted
+// Helper to clean and parse JSON that might be badly escaped
 function parseServiceAccount(key: string): any {
   if (!key) return null;
   
   let s = key.trim();
   
-  // Try direct parse
-  try {
-    const direct = JSON.parse(s);
-    if (typeof direct === 'object' && direct !== null) return direct;
-    if (typeof direct === 'string') s = direct; // Double encoded
-  } catch (e) {
-    // If direct parse fails, it might be literally escaped e.g. {\"type\":...}
-    // We try to unescape it
-    if (s.includes('\\"')) {
-      s = s.replace(/\\"/g, '"');
-      // DO NOT replace \\n with \n here, as JSON.parse expects escaped newlines (\n) inside strings
-    }
-    // Remove outer quotes if it was entered as a quoted string literal
-    if (s.startsWith('"') && s.endsWith('"')) {
-      s = s.slice(1, -1);
-    }
+  // 1. Remove outer quotes if the entire string was quoted as a literal
+  if (s.startsWith('"') && s.endsWith('"')) {
+    s = s.slice(1, -1);
   }
 
-  // Final attempt
+  // 2. Unescape common JSON character escapes that might be literally preserved
+  // This handles the "Bad escaped character" error by cleaning up \M, \P etc.
+  // which often happen if someone pastes a key and it gets double-escaped or partially escaped.
+  
+  // If the string contains literal \" but is NOT valid JSON, we fix the quotes
+  if (s.includes('\\"')) {
+    s = s.replace(/\\"/g, '"');
+  }
+
+  // Handle literal backslashes for newlines in the private key
+  s = s.replace(/\\\\n/g, '\\n'); // Convert \\\\n to \\n for JSON.parse
+  
+  // Try to parse. If it fails due to illegal escapes, we take more drastic measures.
   try {
     return JSON.parse(s);
   } catch (e) {
-    throw new Error(`Invalid JSON format: ${(e as Error).message}`);
+    // Drastic: replace all single backslashes that aren't followed by valid escape chars
+    // This is risky but often necessary for "garbage" string inputs
+    const cleaned = s.replace(/\\([^"\\\/bfnrtu])/g, '$1');
+    try {
+      return JSON.parse(cleaned);
+    } catch (e2) {
+      throw new Error(`Invalid JSON: ${(e as Error).message}`);
+    }
   }
 }
 

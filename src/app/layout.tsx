@@ -60,19 +60,20 @@ export default function RootLayout({
                       {children}
                   </main>
                   <MobileNav />
+                  <Toaster />
                 </div>
 
                 {/* Desktop layout wrapper */}
                 <div className="hidden md:block w-full">
                   <SidebarInset>
                       {children}
+                      <Toaster />
                   </SidebarInset>
                 </div>
 
               </SidebarProvider>
             </MaintenanceProvider>
           </FirebaseClientProvider>
-          <Toaster />
           <PwaInstallPrompt />
       </body>
     </html>
