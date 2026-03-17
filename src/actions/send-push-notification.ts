@@ -4,6 +4,37 @@
 import * as admin from 'firebase-admin';
 import { Message } from 'firebase-admin/messaging';
 
+// Helper to clean and parse JSON that might be escaped or double-quoted
+function parseServiceAccount(key: string): any {
+  if (!key) return null;
+  
+  let s = key.trim();
+  
+  // Try direct parse
+  try {
+    const direct = JSON.parse(s);
+    if (typeof direct === 'object' && direct !== null) return direct;
+    if (typeof direct === 'string') s = direct; // Double encoded
+  } catch (e) {
+    // If direct parse fails, it might be literally escaped e.g. {\"type\":...}
+    // We try to unescape it
+    if (s.includes('\\"')) {
+      s = s.replace(/\\"/g, '"').replace(/\\n/g, '\n');
+    }
+    // Remove outer quotes if it was entered as a quoted string literal
+    if (s.startsWith('"') && s.endsWith('"')) {
+      s = s.slice(1, -1);
+    }
+  }
+
+  // Final attempt
+  try {
+    return JSON.parse(s);
+  } catch (e) {
+    throw new Error(`Invalid JSON format: ${(e as Error).message}`);
+  }
+}
+
 // Helper to initialize the admin app safely and return status
 function getAdminAppWithStatus() {
   const status: string[] = [];
@@ -18,21 +49,17 @@ function getAdminAppWithStatus() {
   if (serviceAccountKey) {
     status.push(`Key found (len: ${serviceAccountKey.length})`);
     try {
-      let parsed = JSON.parse(serviceAccountKey);
-      if (typeof parsed === 'string') {
-        status.push("Double-encoded string detected, parsing again");
-        parsed = JSON.parse(parsed);
-      }
+      const parsed = parseServiceAccount(serviceAccountKey);
 
-      if (parsed.project_id && parsed.private_key) {
-        status.push(`Credentials valid for: ${parsed.project_id}`);
+      if (parsed && parsed.project_id && parsed.private_key) {
+        status.push(`Credentials valid for project: ${parsed.project_id}`);
         const app = admin.initializeApp({
           credential: admin.credential.cert(parsed),
           projectId: parsed.project_id
         });
         return { app, status: status.join('; ') };
       } else {
-        status.push("JSON missing project_id or private_key");
+        status.push("JSON parsed but missing project_id or private_key");
       }
     } catch (e) {
       status.push(`Parse error: ${(e as Error).message}`);

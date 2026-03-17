@@ -166,10 +166,12 @@ export default function AdminNotificationsPage() {
             }
 
             console.log('AdminNotif: Showing final toast.');
+            const shortPushDetails = pushDetails.length > 300 ? pushDetails.substring(0, 300) + '...' : pushDetails;
+            
             toast({ 
                 variant: pushSuccess ? 'default' : 'destructive',
-                title: pushSuccess ? 'Notifications Sent!' : 'Partial Success', 
-                description: `In-app: ${count} users. ${pushDetails}` 
+                title: pushSuccess ? 'Notifications Sent!' : 'Notification Error', 
+                description: `In-app: ${count} users. ${shortPushDetails}` 
             });
             form.reset();
 
