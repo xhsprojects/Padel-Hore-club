@@ -152,10 +152,10 @@ export default function AdminNotificationsPage() {
 
                     if (pushResult.success) {
                         console.log('AdminNotif: Push result:', pushResult);
-                        pushDetails = `Push: ${pushResult.successCount} ok, ${pushResult.failureCount} failed. [Init: ${pushResult.initStatus || '?'}]`;
+                        pushDetails = `Push: ${pushResult.successCount} sent, ${pushResult.failureCount} failed.`;
                     } else {
                         console.error('AdminNotif: Push failed.', pushResult.error, pushResult.initStatus);
-                        pushDetails = `Push Error: ${pushResult.error} [Init: ${pushResult.initStatus || '?'}]`;
+                        pushDetails = `Push Error: ${pushResult.error}`;
                         pushSuccess = false;
                     }
                 } catch (pushErr) {

@@ -23,7 +23,7 @@ import { Crown } from '@/components/icons';
 import { BadgeDisplay } from '@/components/profile/badge-display';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { NotificationDiagnostics } from '@/components/profile/notification-diagnostics';
+          {/* NotificationDiagnostics removed as debugging is complete */}
 
 const DEFAULT_ADMIN_UID = "sWO5cXkN9CcuwyhLTG3gfUmY0HH2";
 
@@ -436,7 +436,7 @@ export default function MyProfilePage() {
             </Card>
           )}
 
-          <NotificationDiagnostics userId={user.uid} firestore={firestore} />
+{/* NotificationDiagnostics removed */}
 
           <div className="space-y-4">
             <h2 className="font-black text-2xl text-center uppercase tracking-widest">Match History</h2>
