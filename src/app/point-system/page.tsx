@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useFirebase, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { AppSettings, Tier } from '@/lib/types';
-import { Trophy, Star, Flame, Award, ShieldCheck, RefreshCw, Loader2 } from 'lucide-react';
+import { Trophy, Star, Flame, Award, ShieldCheck, RefreshCw, Loader2, Rocket } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { POINT_RULES, DEFAULT_THRESHOLDS, DEFAULT_RESET_PERCENTAGES } from '@/lib/constants';
 import React from 'react';
@@ -56,9 +56,13 @@ export default function PointSystemPage() {
                                     title="Poin Dasar (Partisipasi & Hasil)"
                                     icon={Star}
                                 >
-                                    <PointDetail label="Partisipasi (Member)" value={rules.PARTICIPATION.MEMBER} />
-                                    <PointDetail label="Menang Pertandingan" value={rules.RESULT.WIN} />
-                                    <PointDetail label="Kalah Pertandingan" value={rules.RESULT.LOSS} />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
+                                        <PointDetail label="Partisipasi (Member)" value={rules.PARTICIPATION.MEMBER} />
+                                        <PointDetail label="Partisipasi (Non-Member)" value={rules.PARTICIPATION.NON_MEMBER} />
+                                        <PointDetail label="Menang Pertandingan" value={rules.RESULT.WIN} />
+                                        <PointDetail label="Kalah Pertandingan" value={rules.RESULT.LOSS} />
+                                        <PointDetail label="Hasil Seri" value={rules.RESULT.DRAW} />
+                                    </div>
                                 </PointCategory>
 
                                 <PointCategory
@@ -71,30 +75,36 @@ export default function PointSystemPage() {
                                     <PointDetail label="Kekalahan Terhormat (selisih 1-2)" value={rules.MARGIN_BONUS.HONORABLE_LOSS} />
                                 </PointCategory>
 
+                                <PointCategory
+                                    value="item-Performance"
+                                    title="Performa & Konsistensi"
+                                    icon={Rocket}
+                                >
+                                    <PointDetail 
+                                        label={`Win Streak (Menang ${rules.CONSISTENCY.WIN_STREAK_THRESHOLD}x Beruntun)`} 
+                                        value={rules.CONSISTENCY.WIN_STREAK_BONUS} 
+                                    />
+                                    <PointDetail 
+                                        label={`Aktivitas Mingguan (${rules.CONSISTENCY.WEEKLY_ACTIVITY_THRESHOLD}x Main / Minggu)`} 
+                                        value={rules.CONSISTENCY.WEEKLY_ACTIVITY_BONUS} 
+                                    />
+                                    <PointDetail 
+                                        label={`Aktivitas Bulanan (${rules.CONSISTENCY.MONTHLY_ACTIVITY_THRESHOLD}x Main / Bulan)`} 
+                                        value={rules.CONSISTENCY.MONTHLY_ACTIVITY_BONUS} 
+                                    />
+                                </PointCategory>
+
                                  <PointCategory
                                     value="item-3"
                                     title="Bonus Perilaku Positif"
                                     icon={Award}
                                 >
-                                    <PointDetail label="Menjadi Host Pertandingan" value={rules.BEHAVIOR.HOST_MATCH} />
-                                    <PointDetail label="Membantu Isi Slot Kosong" value={rules.BEHAVIOR.SLOT_FILLER} />
-                                    <PointDetail label="Datang Tepat Waktu" value={rules.BEHAVIOR.ON_TIME} />
-                                    <PointDetail label="Menunjukkan Fair Play" value={rules.BEHAVIOR.FAIR_PLAY} />
-                                </PointCategory>
-
-                                 <PointCategory
-                                    value="item-4"
-                                    title="Bonus Konsistensi & Aktivitas"
-                                    icon={ShieldCheck}
-                                >
-                                    <PointDetail 
-                                        label={`Bermain ${rules.CONSISTENCY.WEEKLY_ACTIVITY_THRESHOLD}x dalam Seminggu`}
-                                        value={rules.CONSISTENCY.WEEKLY_ACTIVITY_BONUS} 
-                                    />
-                                     <PointDetail 
-                                        label={`Bermain ${rules.CONSISTENCY.MONTHLY_ACTIVITY_THRESHOLD}x dalam Sebulan`}
-                                        value={rules.CONSISTENCY.MONTHLY_ACTIVITY_BONUS} 
-                                    />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
+                                        <PointDetail label="Menjadi Host Pertandingan" value={rules.BEHAVIOR.HOST_MATCH} />
+                                        <PointDetail label="Membantu Isi Slot Kosong" value={rules.BEHAVIOR.SLOT_FILLER} />
+                                        <PointDetail label="Datang Tepat Waktu" value={rules.BEHAVIOR.ON_TIME} />
+                                        <PointDetail label="Menunjukkan Fair Play" value={rules.BEHAVIOR.FAIR_PLAY} />
+                                    </div>
                                 </PointCategory>
 
                                 <PointCategory
@@ -102,33 +112,36 @@ export default function PointSystemPage() {
                                     title="Reset Poin Musiman"
                                     icon={RefreshCw}
                                 >
-                                    <div className="space-y-4 py-3 text-sm">
-                                        <p className="text-muted-foreground leading-relaxed">
-                                            Di akhir setiap musim, poin semua pemain akan mengalami "soft reset". Tujuannya adalah untuk menjaga kompetisi tetap segar, sekaligus tetap menghargai performa pemain di musim sebelumnya. Semakin tinggi tier akhir Anda, semakin besar persentase poin musiman yang Anda pertahankan.
+                                    <div className="space-y-4 py-3 text-sm text-muted-foreground">
+                                        <p className="leading-relaxed">
+                                            Di akhir setiap musim, poin semua pemain akan mengalami "soft reset". Tujuannya adalah untuk menjaga kompetisi tetap segar, sekaligus tetap menghargai performa pemain di musim sebelumnya.
                                         </p>
                                         
-                                        <div>
-                                            <p className="font-semibold text-foreground">Formula Reset:</p>
-                                            <code className="relative mt-1 block rounded bg-muted px-4 py-2 font-mono text-sm font-semibold text-emerald-600">
+                                        <div className="bg-muted/50 p-4 rounded-2xl space-y-3">
+                                            <p className="font-bold text-foreground">Formula Reset:</p>
+                                            <code className="block font-mono text-emerald-600 bg-white/50 p-2 rounded-lg text-center border border-emerald-500/10">
                                                 Poin Baru = (Poin Musim Lalu × % Tier) + Poin Dasar Tier
                                             </code>
                                         </div>
 
-                                        <div>
-                                            <p className="font-semibold text-foreground">Persentase Poin yang Dipertahankan:</p>
-                                            <ul className="list-disc space-y-1 pl-5 pt-2 text-muted-foreground">
+                                        <div className="space-y-2">
+                                            <p className="font-bold text-foreground">Persentase Poin yang Dipertahankan:</p>
+                                            <div className="grid grid-cols-2 gap-2">
                                                 {tiers.map((t) => (
-                                                    <li key={t.id}>
-                                                        <span className="font-semibold text-foreground capitalize">{t.name}:</span> {percentages[t.id] ?? 20}%
-                                                    </li>
+                                                    <div key={t.id} className="flex justify-between items-center bg-white/30 p-2 px-4 rounded-xl border border-emerald-500/5">
+                                                        <span className="font-semibold text-foreground capitalize">{t.name}</span>
+                                                        <span className="font-black text-emerald-600">{percentages[t.id] ?? 20}%</span>
+                                                    </div>
                                                 ))}
-                                            </ul>
+                                            </div>
                                         </div>
 
-                                        <div>
-                                            <p className="font-semibold text-foreground">Contoh:</p>
-                                            <p className="text-xs text-muted-foreground">
-                                                Seorang pemain di tier <strong className="text-foreground">Silver</strong> menyelesaikan musim dengan 800 poin. Poin musim barunya akan menjadi (800 × {percentages.silver ?? 30}%) + {(thresholds.silver?.min ?? 601)} (poin dasar Silver) = {800 * (percentages.silver ?? 30) / 100} + {(thresholds.silver?.min ?? 601)} = <strong>{800 * (percentages.silver ?? 30) / 100 + (thresholds.silver?.min ?? 601)} poin</strong>.
+                                        <div className="border-t border-emerald-500/5 pt-4">
+                                            <p className="font-bold text-foreground mb-1">Contoh:</p>
+                                            <p className="text-xs leading-relaxed">
+                                                Pemain tier <strong className="text-foreground">Silver</strong> menyelesaikan musim dengan 800 poin. 
+                                                Reset-nya: <br/>
+                                                (800 × {percentages.silver ?? 30}%) + {(thresholds.silver?.min ?? 601)} = <strong>{800 * (percentages.silver ?? 30) / 100 + (thresholds.silver?.min ?? 601)} poin</strong>.
                                             </p>
                                         </div>
                                     </div>
