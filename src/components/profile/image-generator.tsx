@@ -196,6 +196,11 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
             ctx.globalAlpha = 0.3;
             ctx.drawImage(bannerImg, (CARD_WIDTH - drawW) / 2, (bannerHeight - drawH) / 2, drawW, drawH);
             ctx.globalAlpha = 1.0;
+
+            // White overlay to ensure text readability (especially if image is dark)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.fillRect(0, 0, CARD_WIDTH, bannerHeight);
+
             if ('filter' in ctx) {
                 ctx.filter = 'none';
             }
