@@ -40,33 +40,10 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
         return;
     }
 
-    // Try standard loading with crossOrigin first (faster/simpler)
     const img = new Image();
-    img.crossOrigin = 'anonymous';
-    
+    img.crossOrigin = 'anonymous'; // Important for external images
     img.onload = () => resolve(img);
-    
-    img.onerror = () => {
-        // Fallback to fetch + blob if standard loading fails
-        console.warn(`Standard load failed for ${src}, trying fetch fallback...`);
-        fetch(src, { mode: 'cors' })
-          .then(response => {
-            if (!response.ok) throw new Error('Network response error');
-            return response.blob();
-          })
-          .then(blob => {
-            const blobImg = new Image();
-            const url = URL.createObjectURL(blob);
-            blobImg.onload = () => resolve(blobImg);
-            blobImg.onerror = () => reject(new Error('Blob load failed'));
-            blobImg.src = url;
-          })
-          .catch(err => {
-            console.error("All image load attempts failed:", err);
-            reject(err);
-          });
-    };
-    
+    img.onerror = (e) => reject(e);
     img.src = src;
   });
 }

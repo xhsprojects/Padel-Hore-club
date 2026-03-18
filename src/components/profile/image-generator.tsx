@@ -174,12 +174,7 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
     // Draw blurred profile pic as banner if available
     if (player.photoURL) {
         try {
-            // Append cache-busting to avoid CORS issues from browser cache
-            const photoUrlWithCacheBust = player.photoURL.includes('?') 
-                ? `${player.photoURL}&v=${Date.now()}` 
-                : `${player.photoURL}?v=${Date.now()}`;
-                
-            const bannerImg = await loadImage(photoUrlWithCacheBust);
+            const bannerImg = await loadImage(player.photoURL);
             ctx.save();
             ctx.beginPath();
             ctx.rect(0, 0, CARD_WIDTH, bannerHeight);
@@ -251,12 +246,7 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
     let avatarLoaded = false;
     if (player.photoURL) {
         try {
-            // Cache-busting for avatar
-            const avatarUrlWithCacheBust = player.photoURL.includes('?') 
-                ? `${player.photoURL}&v=${Date.now()}` 
-                : `${player.photoURL}?v=${Date.now()}`;
-                
-            const avatarImg = await loadImage(avatarUrlWithCacheBust);
+            const avatarImg = await loadImage(player.photoURL);
             ctx.save();
             ctx.beginPath();
             ctx.arc(CARD_WIDTH / 2, avatarY, avatarRadius, 0, Math.PI * 2, true);
@@ -420,12 +410,7 @@ async function drawTierUpCard(ctx: CanvasRenderingContext2D, player: UserProfile
     // Draw blurred profile pic as background if available
     if (player.photoURL) {
         try {
-            // Cache-busting for tier up banner
-            const photoUrlWithCacheBust = player.photoURL.includes('?') 
-                ? `${player.photoURL}&v=${Date.now()}` 
-                : `${player.photoURL}?v=${Date.now()}`;
-                
-            const bannerImg = await loadImage(photoUrlWithCacheBust);
+            const bannerImg = await loadImage(player.photoURL);
             ctx.save();
             if ('filter' in ctx) {
                 ctx.filter = 'blur(40px)';
@@ -515,12 +500,7 @@ async function drawTierUpCard(ctx: CanvasRenderingContext2D, player: UserProfile
     let avatarLoaded = false;
     if (player.photoURL) {
         try {
-            // Cache-busting for tier up avatar
-            const avatarUrlWithCacheBust = player.photoURL.includes('?') 
-                ? `${player.photoURL}&v=${Date.now()}` 
-                : `${player.photoURL}?v=${Date.now()}`;
-                
-            const avatarImg = await loadImage(avatarUrlWithCacheBust);
+            const avatarImg = await loadImage(player.photoURL);
             ctx.save();
             ctx.beginPath();
             ctx.arc(CARD_WIDTH / 2, avatarY, avatarRadius, 0, Math.PI * 2, true);
