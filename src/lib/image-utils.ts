@@ -40,11 +40,17 @@ export function loadImage(src: string): Promise<HTMLImageElement> {
         return;
     }
 
+    // Determine target URL - proxy if external
+    let targetSrc = src;
+    if (src.startsWith('http')) {
+        targetSrc = `/api/proxy-image?url=${encodeURIComponent(src)}`;
+    }
+
     const img = new Image();
-    img.crossOrigin = 'anonymous'; // Important for external images
+    img.crossOrigin = 'anonymous'; // Still good practice, but proxy handles headers now
     img.onload = () => resolve(img);
     img.onerror = (e) => reject(e);
-    img.src = src;
+    img.src = targetSrc;
   });
 }
 
