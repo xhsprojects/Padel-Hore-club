@@ -29,7 +29,7 @@ import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { UserProfile, WithId, PointBreakdown, Match, Court, TierThresholds } from '@/lib/types';
+import type { UserProfile, WithId, PointBreakdown, Match, Court, TierThresholds, AppSettings } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { PlusCircle, Terminal, UserPlus, X, Award, Clock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -93,6 +93,12 @@ export function EditMatchForm({ match, allPlayers, setOpen }: EditMatchFormProps
   }, [firestore]);
   const { data: tierSettings } = useDoc<TierThresholds>(tierSettingsRef);
   const thresholds = tierSettings || DEFAULT_THRESHOLDS;
+
+  const settingsRef = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return doc(firestore, 'settings', 'general');
+  }, [firestore]);
+  const { data: appSettings } = useDoc<AppSettings>(settingsRef);
 
   const selectablePlayers = useMemo(() => allPlayers.filter(p => p.role !== 'admin'), [allPlayers]);
   const playerMap = useMemo(() => new Map(allPlayers.map(p => [p.id, p])), [allPlayers]);
@@ -185,6 +191,14 @@ export function EditMatchForm({ match, allPlayers, setOpen }: EditMatchFormProps
         const newAllPlayerIds = [...newTeam1Ids, ...newTeam2Ids];
         const newPointBreakdowns: { [key: string]: PointBreakdown } = {};
 
+        const rules = {
+            PARTICIPATION: { ...POINT_RULES.PARTICIPATION, ...appSettings?.pointRules?.PARTICIPATION },
+            RESULT: { ...POINT_RULES.RESULT, ...appSettings?.pointRules?.RESULT },
+            MARGIN_BONUS: { ...POINT_RULES.MARGIN_BONUS, ...appSettings?.pointRules?.MARGIN_BONUS },
+            BEHAVIOR: { ...POINT_RULES.BEHAVIOR, ...appSettings?.pointRules?.BEHAVIOR },
+            CONSISTENCY: { ...POINT_RULES.CONSISTENCY, ...appSettings?.pointRules?.CONSISTENCY },
+        };
+
         for (const playerId of newAllPlayerIds) {
              if (!playerProfilesToUpdate[playerId]) {
                 const playerDoc = await getDoc(doc(firestore, 'users', playerId));
@@ -201,24 +215,24 @@ export function EditMatchForm({ match, allPlayers, setOpen }: EditMatchFormProps
             const margin = Math.abs(data.score1 - data.score2);
             const isWinner = (winnerTeam === 'Team 1' && newTeam1Ids.includes(playerId)) || (winnerTeam === 'Team 2' && newTeam2Ids.includes(playerId));
             
-            breakdown.base = player.role === 'member' ? POINT_RULES.PARTICIPATION.MEMBER : POINT_RULES.PARTICIPATION.NON_MEMBER;
-            if (winnerTeam === 'Draw') breakdown.result = POINT_RULES.RESULT.DRAW;
-            else if (isWinner) breakdown.result = POINT_RULES.RESULT.WIN;
-            else breakdown.result = POINT_RULES.RESULT.LOSS;
+            breakdown.base = player.role === 'member' ? rules.PARTICIPATION.MEMBER : rules.PARTICIPATION.NON_MEMBER;
+            if (winnerTeam === 'Draw') breakdown.result = rules.RESULT.DRAW;
+            else if (isWinner) breakdown.result = rules.RESULT.WIN;
+            else breakdown.result = rules.RESULT.LOSS;
 
             if (winnerTeam !== 'Draw') {
                 if (isWinner) {
-                    if (margin >= 5) breakdown.margin = POINT_RULES.MARGIN_BONUS.DOMINANT_WIN;
-                    else if (margin >= 1 && margin <= 4) breakdown.margin = POINT_RULES.MARGIN_BONUS.CLOSE_WIN;
+                    if (margin >= 5) breakdown.margin = rules.MARGIN_BONUS.DOMINANT_WIN;
+                    else if (margin >= 1 && margin <= 4) breakdown.margin = rules.MARGIN_BONUS.CLOSE_WIN;
                 } else {
-                    if (margin <= 2) breakdown.margin = POINT_RULES.MARGIN_BONUS.HONORABLE_LOSS;
+                    if (margin <= 2) breakdown.margin = rules.MARGIN_BONUS.HONORABLE_LOSS;
                 }
             }
 
-            if (data.host_id === playerId) breakdown.host_match = POINT_RULES.BEHAVIOR.HOST_MATCH;
-            if (data.onTimePlayers.includes(playerId)) breakdown.on_time = POINT_RULES.BEHAVIOR.ON_TIME;
-            if (data.fairPlayPlayers.includes(playerId)) breakdown.fair_play = POINT_RULES.BEHAVIOR.FAIR_PLAY;
-            if (data.slotFillerPlayers.includes(playerId)) breakdown.slot_filler = POINT_RULES.BEHAVIOR.SLOT_FILLER;
+            if (data.host_id === playerId) breakdown.host_match = rules.BEHAVIOR.HOST_MATCH;
+            if (data.onTimePlayers.includes(playerId)) breakdown.on_time = rules.BEHAVIOR.ON_TIME;
+            if (data.fairPlayPlayers.includes(playerId)) breakdown.fair_play = rules.BEHAVIOR.FAIR_PLAY;
+            if (data.slotFillerPlayers.includes(playerId)) breakdown.slot_filler = rules.BEHAVIOR.SLOT_FILLER;
             
             // Note: Consistency bonus calculation is omitted in edit for simplicity, as it depends on historical data.
             

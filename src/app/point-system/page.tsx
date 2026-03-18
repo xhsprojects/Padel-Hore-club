@@ -19,6 +19,13 @@ export default function PointSystemPage() {
 
     const thresholds = appSettings?.tierThresholds || DEFAULT_THRESHOLDS;
     const percentages = appSettings?.tierResetPercentages || DEFAULT_RESET_PERCENTAGES;
+    const rules = {
+        PARTICIPATION: { ...POINT_RULES.PARTICIPATION, ...appSettings?.pointRules?.PARTICIPATION },
+        RESULT: { ...POINT_RULES.RESULT, ...appSettings?.pointRules?.RESULT },
+        MARGIN_BONUS: { ...POINT_RULES.MARGIN_BONUS, ...appSettings?.pointRules?.MARGIN_BONUS },
+        BEHAVIOR: { ...POINT_RULES.BEHAVIOR, ...appSettings?.pointRules?.BEHAVIOR },
+        CONSISTENCY: { ...POINT_RULES.CONSISTENCY, ...appSettings?.pointRules?.CONSISTENCY },
+    };
 
     const tiers: { id: Tier; name: string }[] = [
         { id: 'gold', name: 'Gold' },
@@ -49,9 +56,9 @@ export default function PointSystemPage() {
                                     title="Poin Dasar (Partisipasi & Hasil)"
                                     icon={Star}
                                 >
-                                    <PointDetail label="Partisipasi (Member)" value={POINT_RULES.PARTICIPATION.MEMBER} />
-                                    <PointDetail label="Menang Pertandingan" value={POINT_RULES.RESULT.WIN} />
-                                    <PointDetail label="Kalah Pertandingan" value={POINT_RULES.RESULT.LOSS} />
+                                    <PointDetail label="Partisipasi (Member)" value={rules.PARTICIPATION.MEMBER} />
+                                    <PointDetail label="Menang Pertandingan" value={rules.RESULT.WIN} />
+                                    <PointDetail label="Kalah Pertandingan" value={rules.RESULT.LOSS} />
                                 </PointCategory>
 
                                 <PointCategory
@@ -59,9 +66,9 @@ export default function PointSystemPage() {
                                     title="Bonus Margin Skor"
                                     icon={Flame}
                                 >
-                                    <PointDetail label="Kemenangan Dominan (selisih 5+)" value={POINT_RULES.MARGIN_BONUS.DOMINANT_WIN} />
-                                    <PointDetail label="Kemenangan Tipis (selisih 1-4)" value={POINT_RULES.MARGIN_BONUS.CLOSE_WIN} />
-                                    <PointDetail label="Kekalahan Terhormat (selisih 1-2)" value={POINT_RULES.MARGIN_BONUS.HONORABLE_LOSS} />
+                                    <PointDetail label="Kemenangan Dominan (selisih 5+)" value={rules.MARGIN_BONUS.DOMINANT_WIN} />
+                                    <PointDetail label="Kemenangan Tipis (selisih 1-4)" value={rules.MARGIN_BONUS.CLOSE_WIN} />
+                                    <PointDetail label="Kekalahan Terhormat (selisih 1-2)" value={rules.MARGIN_BONUS.HONORABLE_LOSS} />
                                 </PointCategory>
 
                                  <PointCategory
@@ -69,10 +76,10 @@ export default function PointSystemPage() {
                                     title="Bonus Perilaku Positif"
                                     icon={Award}
                                 >
-                                    <PointDetail label="Menjadi Host Pertandingan" value={POINT_RULES.BEHAVIOR.HOST_MATCH} />
-                                    <PointDetail label="Membantu Isi Slot Kosong" value={POINT_RULES.BEHAVIOR.SLOT_FILLER} />
-                                    <PointDetail label="Datang Tepat Waktu" value={POINT_RULES.BEHAVIOR.ON_TIME} />
-                                    <PointDetail label="Menunjukkan Fair Play" value={POINT_RULES.BEHAVIOR.FAIR_PLAY} />
+                                    <PointDetail label="Menjadi Host Pertandingan" value={rules.BEHAVIOR.HOST_MATCH} />
+                                    <PointDetail label="Membantu Isi Slot Kosong" value={rules.BEHAVIOR.SLOT_FILLER} />
+                                    <PointDetail label="Datang Tepat Waktu" value={rules.BEHAVIOR.ON_TIME} />
+                                    <PointDetail label="Menunjukkan Fair Play" value={rules.BEHAVIOR.FAIR_PLAY} />
                                 </PointCategory>
 
                                  <PointCategory
@@ -81,12 +88,12 @@ export default function PointSystemPage() {
                                     icon={ShieldCheck}
                                 >
                                     <PointDetail 
-                                        label={`Bermain ${POINT_RULES.CONSISTENCY.WEEKLY_ACTIVITY_THRESHOLD}x dalam Seminggu`}
-                                        value={POINT_RULES.CONSISTENCY.WEEKLY_ACTIVITY_BONUS} 
+                                        label={`Bermain ${rules.CONSISTENCY.WEEKLY_ACTIVITY_THRESHOLD}x dalam Seminggu`}
+                                        value={rules.CONSISTENCY.WEEKLY_ACTIVITY_BONUS} 
                                     />
                                      <PointDetail 
-                                        label={`Bermain ${POINT_RULES.CONSISTENCY.MONTHLY_ACTIVITY_THRESHOLD}x dalam Sebulan`}
-                                        value={POINT_RULES.CONSISTENCY.MONTHLY_ACTIVITY_BONUS} 
+                                        label={`Bermain ${rules.CONSISTENCY.MONTHLY_ACTIVITY_THRESHOLD}x dalam Sebulan`}
+                                        value={rules.CONSISTENCY.MONTHLY_ACTIVITY_BONUS} 
                                     />
                                 </PointCategory>
 

@@ -37,7 +37,7 @@ import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { UserProfile, WithId, PointBreakdown, Match, Court, Season, Tier, UserBadge, TierThresholds, Event } from '@/lib/types';
+import type { UserProfile, WithId, PointBreakdown, Match, Court, Season, Tier, UserBadge, TierThresholds, Event, AppSettings } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { PlusCircle, Terminal, UserPlus, X, Award, Clock, Users, ArrowDown, QrCode, Flame, Shield, Sparkles, Bike, Swords, Rocket, Sunrise, Moon, CalendarDays, ShieldAlert, Loader2, ChevronRight, Check } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -45,7 +45,7 @@ import { useRouter } from 'next/navigation';
 import { useFirebase, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { POINT_RULES, TIER_FRAME_CLASSES, DEFAULT_THRESHOLDS } from '@/lib/constants';
 import { ALL_BADGES } from '@/lib/badges';
-import { collection, doc, writeBatch, getDocs, query, where, Timestamp, orderBy, setDoc } from 'firebase/firestore';
+import { collection, doc, writeBatch, getDocs, query, where, Timestamp, orderBy, setDoc, getDoc } from 'firebase/firestore';
 import { startOfWeek, format } from 'date-fns';
 import { cn, getTier, capitalize } from '@/lib/utils';
 import { FirebaseError } from 'firebase/app';
@@ -121,6 +121,12 @@ export function MatchForm({ allPlayers, prefilledPlayerIds, prefillOnTime, event
   }, [firestore]);
   const { data: tierSettings } = useDoc<TierThresholds>(tierSettingsRef);
   const thresholds = tierSettings || DEFAULT_THRESHOLDS;
+  
+  const settingsRef = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return doc(firestore, 'settings', 'general');
+  }, [firestore]);
+  const { data: appSettings } = useDoc<AppSettings>(settingsRef);
   
   const playerMap = useMemo(() => new Map(allPlayers.map(p => [p.id, p])), [allPlayers]);
 
@@ -302,6 +308,14 @@ export function MatchForm({ allPlayers, prefilledPlayerIds, prefillOnTime, event
 
         const winner_team = data.score1 > data.score2 ? 'Team 1' : data.score2 > data.score1 ? 'Team 2' : 'Draw';
         const margin = Math.abs(data.score1 - data.score2);
+
+        const rules = {
+            PARTICIPATION: { ...POINT_RULES.PARTICIPATION, ...appSettings?.pointRules?.PARTICIPATION },
+            RESULT: { ...POINT_RULES.RESULT, ...appSettings?.pointRules?.RESULT },
+            MARGIN_BONUS: { ...POINT_RULES.MARGIN_BONUS, ...appSettings?.pointRules?.MARGIN_BONUS },
+            BEHAVIOR: { ...POINT_RULES.BEHAVIOR, ...appSettings?.pointRules?.BEHAVIOR },
+            CONSISTENCY: { ...POINT_RULES.CONSISTENCY, ...appSettings?.pointRules?.CONSISTENCY },
+        };
         
         const batch = writeBatch(firestore);
         const pointBreakdowns: { [key: string]: PointBreakdown } = {};
@@ -322,24 +336,24 @@ export function MatchForm({ allPlayers, prefilledPlayerIds, prefillOnTime, event
             const breakdown: PointBreakdown = { base: 0, result: 0, margin: 0, host_match: 0, slot_filler: 0, on_time: 0, fair_play: 0, consistency: 0, total: 0 };
             const isWinner = (winner_team === 'Team 1' && team1_ids.includes(player.id)) || (winner_team === 'Team 2' && team2_ids.includes(player.id));
             
-            breakdown.base += player.role === 'member' ? POINT_RULES.PARTICIPATION.MEMBER : POINT_RULES.PARTICIPATION.NON_MEMBER;
-
+            breakdown.base += player.role === 'member' ? rules.PARTICIPATION.MEMBER : rules.PARTICIPATION.NON_MEMBER;
+            
             let resultPoints = 0;
             if (winner_team === 'Draw') {
-                resultPoints = POINT_RULES.RESULT.DRAW;
+                resultPoints = rules.RESULT.DRAW;
             } else if (isWinner) {
-                resultPoints = POINT_RULES.RESULT.WIN;
+                resultPoints = rules.RESULT.WIN;
             } else {
-                resultPoints = POINT_RULES.RESULT.LOSS;
+                resultPoints = rules.RESULT.LOSS;
             }
 
             let marginPoints = 0;
             if (winner_team !== 'Draw') {
                 if (isWinner) {
-                    if (margin >= 5) marginPoints = POINT_RULES.MARGIN_BONUS.DOMINANT_WIN;
-                    else if (margin >= 1 && margin <= 4) marginPoints = POINT_RULES.MARGIN_BONUS.CLOSE_WIN;
+                    if (margin >= 5) marginPoints = rules.MARGIN_BONUS.DOMINANT_WIN;
+                    else if (margin >= 1 && margin <= 4) marginPoints = rules.MARGIN_BONUS.CLOSE_WIN;
                 } else { 
-                    if (margin <= 2) marginPoints = POINT_RULES.MARGIN_BONUS.HONORABLE_LOSS;
+                    if (margin <= 2) marginPoints = rules.MARGIN_BONUS.HONORABLE_LOSS;
                 }
             }
 
@@ -351,16 +365,41 @@ export function MatchForm({ allPlayers, prefilledPlayerIds, prefillOnTime, event
             breakdown.result += resultPoints;
             breakdown.margin += marginPoints;
 
-            if (data.host_id === player.id) breakdown.host_match += POINT_RULES.BEHAVIOR.HOST_MATCH;
-            if (data.onTimePlayers.includes(player.id)) breakdown.on_time += POINT_RULES.BEHAVIOR.ON_TIME;
-            if (data.fairPlayPlayers.includes(player.id)) breakdown.fair_play += POINT_RULES.BEHAVIOR.FAIR_PLAY;
-            if (data.slotFillerPlayers.includes(player.id)) breakdown.slot_filler += POINT_RULES.BEHAVIOR.SLOT_FILLER;
+            if (data.host_id === player.id) breakdown.host_match += rules.BEHAVIOR.HOST_MATCH;
+            if (data.onTimePlayers.includes(player.id)) breakdown.on_time += rules.BEHAVIOR.ON_TIME;
+            if (data.fairPlayPlayers.includes(player.id)) breakdown.fair_play += rules.BEHAVIOR.FAIR_PLAY;
+            if (data.slotFillerPlayers.includes(player.id)) breakdown.slot_filler += rules.BEHAVIOR.SLOT_FILLER;
             
             let newWinStreak = player.win_streak || 0;
             if (isWinner) {
                 newWinStreak++;
             } else {
                 newWinStreak = 0;
+            }
+
+            // Consistency & Activity Bonuses
+            if (isWinner && newWinStreak >= rules.CONSISTENCY.WIN_STREAK_THRESHOLD) {
+                breakdown.consistency += rules.CONSISTENCY.WIN_STREAK_BONUS;
+            }
+
+            const allMatchesQuery = query(collection(firestore, 'matches'), where('player_ids', 'array-contains', player.id));
+            const allMatchesSnapshot = await getDocs(allMatchesQuery);
+
+            const now = new Date();
+            const startOfWk = new Date(now);
+            startOfWk.setDate(now.getDate() - now.getDay());
+            startOfWk.setHours(0, 0, 0, 0);
+            
+            const startOfMo = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+
+            const weeklyMatchesCount = allMatchesSnapshot.docs.filter(doc => (doc.data() as Match).timestamp.toDate() >= startOfWk).length + 1;
+            const monthlyMatchesCount = allMatchesSnapshot.docs.filter(doc => (doc.data() as Match).timestamp.toDate() >= startOfMo).length + 1;
+
+            if (weeklyMatchesCount >= rules.CONSISTENCY.WEEKLY_ACTIVITY_THRESHOLD) {
+                breakdown.consistency += rules.CONSISTENCY.WEEKLY_ACTIVITY_BONUS;
+            }
+            if (monthlyMatchesCount >= rules.CONSISTENCY.MONTHLY_ACTIVITY_THRESHOLD) {
+                breakdown.consistency += rules.CONSISTENCY.MONTHLY_ACTIVITY_BONUS;
             }
             
             let totalPointsForMatch = Object.values(breakdown).reduce((sum, val) => sum + val, 0);
@@ -448,16 +487,8 @@ export function MatchForm({ allPlayers, prefilledPlayerIds, prefillOnTime, event
                 }
             }
 
-            const allMatchesQuery = query(collection(firestore, 'matches'), where('player_ids', 'array-contains', player.id));
-            const allMatchesSnapshot = await getDocs(allMatchesQuery);
-
-            const oneWeekAgo = startOfWeek(new Date());
-            const weeklyMatches = allMatchesSnapshot.docs.filter(doc => {
-                const matchData = doc.data() as Match;
-                return matchData.timestamp.toDate() >= oneWeekAgo;
-            });
-
-            if (weeklyMatches.length + 1 >= 5) { // +1 for the current match
+            // Badge logic already handled above but let's sync thresholds if they match
+            if (weeklyMatchesCount >= 5) { // Original badge threshold was 5
                 awardBadge('marathoner', 'Bike');
             }
             

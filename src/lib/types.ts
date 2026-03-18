@@ -88,6 +88,37 @@ export interface Court {
   location: string;
 }
 
+export interface PointRules {
+  PARTICIPATION: {
+    MEMBER: number;
+    NON_MEMBER: number;
+  };
+  RESULT: {
+    WIN: number;
+    LOSS: number;
+    DRAW: number;
+  };
+  MARGIN_BONUS: {
+    DOMINANT_WIN: number; // Win by >= 5 games
+    CLOSE_WIN: number; // Win by 1-4 games
+    HONORABLE_LOSS: number; // Loss by <= 2 games
+  };
+  BEHAVIOR: {
+    HOST_MATCH: number;
+    SLOT_FILLER: number;
+    ON_TIME: number;
+    FAIR_PLAY: number;
+  };
+  CONSISTENCY: {
+    WIN_STREAK_THRESHOLD: number;
+    WIN_STREAK_BONUS: number;
+    WEEKLY_ACTIVITY_THRESHOLD: number;
+    WEEKLY_ACTIVITY_BONUS: number;
+    MONTHLY_ACTIVITY_THRESHOLD: number;
+    MONTHLY_ACTIVITY_BONUS: number;
+  };
+}
+
 export interface AppSettings {
   isMaintenanceMode?: boolean;
   maintenanceMessage?: string;
@@ -95,6 +126,7 @@ export interface AppSettings {
   shopWhatsappNumber?: string;
   tierThresholds?: Partial<TierThresholds>;
   tierResetPercentages?: Partial<Record<Tier, number>>;
+  pointRules?: Partial<PointRules>;
 }
 
 export interface FinalLeaderboardPlayer {
