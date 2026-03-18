@@ -17,7 +17,7 @@ import { cn, getSkillLevelFromWinRate, getTier, capitalize } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, ShieldCheck, User as UserIcon, Star, Phone, Trophy, MapPin, Gem, BarChart3, History as HistoryIcon, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Crown } from '@/components/icons';
+import { Crown, MemberBadge } from '@/components/icons';
 import { BadgeDisplay } from '@/components/profile/badge-display';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -316,7 +316,7 @@ export default function PlayerProfilePage() {
   const gamePlayers = allPlayers.filter(p => p.role !== 'admin' && p.role !== 'guest');
   const sortedGamePlayers = [...gamePlayers].sort((a, b) => (b.total_points || 0) - (a.total_points || 0));
   const rank = sortedGamePlayers.findIndex(p => p.id === id) + 1;
-  const isMemberActive = player.role === 'member' && player.membershipExpiryDate && player.membershipExpiryDate.toDate() > new Date();
+  const isMemberActive = player.role === 'member' && (player.isUnlimitedMember || (player.membershipExpiryDate && player.membershipExpiryDate.toDate() > new Date()));
 
   return (
       <div className="px-4 py-6 sm:px-6 lg:px-8">
@@ -341,7 +341,7 @@ export default function PlayerProfilePage() {
               <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12 sm:-mt-16">
                 <div className="relative">
                   {currentTier === 'gold' && <Crown className="absolute -top-4 left-1/2 -translate-x-1/2 w-10 h-10 sm:w-12 sm:h-12 text-amber-400 z-10" />}
-                  <Avatar className={cn("w-24 h-24 sm:w-32 sm:h-32 bg-background", TIER_FRAME_CLASSES[currentTier])}>
+                  <Avatar className={cn("w-24 h-24 sm:w-32 sm:h-32 bg-background shadow-xl", TIER_FRAME_CLASSES[currentTier])}>
                       {player.photoURL ? (
                           <AvatarImage src={player.photoURL} alt={player.name} />
                       ) : (
@@ -355,11 +355,13 @@ export default function PlayerProfilePage() {
                   <h1 className="font-black text-2xl sm:text-4xl uppercase tracking-wider">{player.name}</h1>
                   <div className="flex items-center gap-x-4 gap-y-2 mt-1 flex-wrap">
                     <p className="font-mono text-primary font-bold text-base sm:text-lg">{player.phId || `PH-${player.id.substring(0,4).toUpperCase()}`}</p>
-                    {isMemberActive && (
-                        <Badge variant="secondary" className="text-sm font-semibold border-primary/50 py-1 px-3">
-                            <ShieldCheck className="mr-2 h-4 w-4 text-primary" />
-                            Member
-                        </Badge>
+                     {isMemberActive && (
+                        <div className="flex flex-col gap-1">
+                            <Badge variant="secondary" className="w-fit text-[10px] sm:text-xs font-black border-amber-500/50 py-1 px-3 bg-amber-50 text-amber-700 shadow-sm ring-1 ring-amber-500/10 transition-all uppercase tracking-wider">
+                                <MemberBadge className="mr-1.5 h-3 w-3 text-amber-600 drop-shadow-sm" />
+                                Official Member
+                            </Badge>
+                        </div>
                     )}
                   </div>
                 </div>

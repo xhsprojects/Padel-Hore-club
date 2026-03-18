@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { Crown } from '@/components/icons';
+import { Crown, MemberBadge } from '@/components/icons';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -316,8 +316,8 @@ export function LeaderboardClient() {
                                                         <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
                                                     </Avatar>
                                                     {isMember && (
-                                                        <div className="absolute -bottom-1 -right-1 bg-emerald-600 rounded-full p-1 border-2 border-white">
-                                                            <Check className="h-2 w-2 text-white stroke-[4]" />
+                                                        <div className="absolute -bottom-1 -right-1 bg-emerald-600 rounded-full p-1 border-2 border-white shadow-sm z-10">
+                                                            <MemberBadge className="h-2.5 w-2.5 text-white stroke-[3]" />
                                                         </div>
                                                     )}
                                                 </div>
