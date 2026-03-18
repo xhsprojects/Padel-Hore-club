@@ -167,11 +167,45 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
     ctx.fillStyle = COLORS.background;
     ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-    // 2. Banner Section
+    // 2. Banner Section (Blurred Profile Pic)
     const bannerHeight = 450;
     const tierColor = COLORS.tier[player.tier] || COLORS.primary;
-    const tierBannerColor = COLORS.tierBanner[player.tier] || 'rgba(20, 77, 59, 0.1)';
     
+    // Draw blurred profile pic as banner if available
+    if (player.photoURL) {
+        try {
+            const bannerImg = await loadImage(player.photoURL);
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, 0, CARD_WIDTH, bannerHeight);
+            ctx.clip();
+            
+            // Apply blur filter if supported
+            if ('filter' in ctx) {
+                ctx.filter = 'blur(20px)';
+            }
+            
+            const aspect = bannerImg.width / bannerImg.height;
+            let drawW = CARD_WIDTH;
+            let drawH = CARD_WIDTH / aspect;
+            if (drawH < bannerHeight) {
+                drawH = bannerHeight;
+                drawW = bannerHeight * aspect;
+            }
+            
+            ctx.globalAlpha = 0.3;
+            ctx.drawImage(bannerImg, (CARD_WIDTH - drawW) / 2, (bannerHeight - drawH) / 2, drawW, drawH);
+            ctx.globalAlpha = 1.0;
+            if ('filter' in ctx) {
+                ctx.filter = 'none';
+            }
+            ctx.restore();
+        } catch (e) {
+            console.error("Banner image failed:", e);
+        }
+    }
+    
+    const tierBannerColor = COLORS.tierBanner[player.tier] || 'rgba(20, 77, 59, 0.1)';
     ctx.fillStyle = tierBannerColor;
     ctx.fillRect(0, 0, CARD_WIDTH, bannerHeight);
 
@@ -284,10 +318,11 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
         currentY += 15;
         ctx.font = 'bold 40px "Inter"';
         ctx.fillStyle = COLORS.primary;
+        ctx.textAlign = 'center';
         ctx.fillText("🛡️ OFFICIAL MEMBER", CARD_WIDTH / 2, currentY);
-        currentY += 45;
+        currentY += 40;
     }
-    currentY += 30;
+    currentY += 30; // Reduced padding before stats grid
 
     // 5. Stats Grid
     const winRate = (player.match_count || 0) > 0 ? ((player.win_count || 0) / (player.match_count || 0)) * 100 : 0;
@@ -298,11 +333,11 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
         { label: 'MATCHES', value: (player.match_count || 0).toLocaleString(), icon: ICONS.totalMain },
     ];
     
-    const statBoxWidth = 400;
-    const statBoxHeight = 160;
+    const statBoxWidth = 420;
+    const statBoxHeight = 200; // Adjusted for better text-only look
     const statGap = 40;
     const statGridX = (CARD_WIDTH - (statBoxWidth * 2 + statGap)) / 2;
-    let statGridY = currentY + 60;
+    let statGridY = currentY; 
 
     stats.forEach((stat, index) => {
         const col = index % 2;
@@ -317,30 +352,20 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
         ctx.fill();
         ctx.stroke();
 
-        // Icon (small)
-        ctx.save();
-        ctx.translate(x + 40, y + 40); 
-        ctx.scale(0.8, 0.8);
-        const p = new Path2D(stat.icon);
-        ctx.strokeStyle = COLORS.mutedForeground;
-        ctx.lineWidth = 2;
-        ctx.stroke(p);
-        ctx.restore();
-
-        // Label
+        // Label (centered)
         ctx.fillStyle = COLORS.mutedForeground;
-        ctx.textAlign = 'left';
-        ctx.font = '600 36px "Inter"';
-        ctx.fillText(stat.label, x + 100, y + 65);
-        
-        // Value
-        ctx.fillStyle = COLORS.foreground;
-        ctx.font = 'bold 64px "Space Grotesk"'; 
         ctx.textAlign = 'center';
-        ctx.fillText(stat.value, x + statBoxWidth / 2, y + 130);
+        ctx.font = '600 36px "Inter"';
+        ctx.fillText(stat.label, x + statBoxWidth / 2, y + 65);
+        
+        // Value (centered)
+        ctx.fillStyle = COLORS.foreground;
+        ctx.font = 'bold 80px "Space Grotesk"'; 
+        ctx.textAlign = 'center';
+        ctx.fillText(stat.value, x + statBoxWidth / 2, y + 145);
     });
 
-    currentY = statGridY + (Math.ceil(stats.length / 2) * (statBoxHeight + statGap)) + 80;
+    currentY = statGridY + (Math.ceil(stats.length / 2) * (statBoxHeight + statGap)) + 40; // Tighten space before QR
     
     // 6. QR Code Section
     const qrSize = 180; 
@@ -364,7 +389,7 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
     }
     
     // 7. Footer
-    currentY += qrSize + 120;
+    currentY += qrSize + 40; // Tighten space before text
     ctx.font = 'bold 44px "Space Grotesk"';
     ctx.fillStyle = COLORS.primary;
     ctx.textAlign = 'center';
@@ -372,7 +397,7 @@ async function drawIdCard(ctx: CanvasRenderingContext2D, player: UserProfile, ra
 
     ctx.font = '400 36px "Inter"';
     ctx.fillStyle = COLORS.mutedForeground;
-    ctx.fillText('#PadelHoreClub #PadelStats', CARD_WIDTH / 2, CARD_HEIGHT - 60);
+    ctx.fillText('#PadelHoreClub #PadelStats', CARD_WIDTH / 2, currentY + 60);
 }
 
 
@@ -381,6 +406,36 @@ async function drawTierUpCard(ctx: CanvasRenderingContext2D, player: UserProfile
     // 1. Festive Background
     const newTierColor = COLORS.tier[player.tier] || COLORS.primary;
     const oldTierColor = COLORS.tier[oldTier] || COLORS.mutedForeground;
+    
+    // Draw blurred profile pic as background if available
+    if (player.photoURL) {
+        try {
+            const bannerImg = await loadImage(player.photoURL);
+            ctx.save();
+            if ('filter' in ctx) {
+                ctx.filter = 'blur(40px)';
+            }
+            
+            const aspect = bannerImg.width / bannerImg.height;
+            let drawW = CARD_WIDTH;
+            let drawH = CARD_WIDTH / aspect;
+            if (drawH < CARD_HEIGHT) {
+                drawH = CARD_HEIGHT;
+                drawW = CARD_HEIGHT * aspect;
+            }
+            
+            ctx.globalAlpha = 0.2;
+            ctx.drawImage(bannerImg, (CARD_WIDTH - drawW) / 2, (CARD_HEIGHT - drawH) / 2, drawW, drawH);
+            ctx.globalAlpha = 1.0;
+            if ('filter' in ctx) {
+                ctx.filter = 'none';
+            }
+            ctx.restore();
+        } catch (e) {
+            console.error("Tier up banner image failed:", e);
+        }
+    }
+
     const newTierHsla = newTierColor.replace('hsl', 'hsla').replace(')', ', 0.3)');
     const gradient = ctx.createRadialGradient(CARD_WIDTH / 2, CARD_HEIGHT / 2, 0, CARD_WIDTH / 2, CARD_HEIGHT / 2, CARD_WIDTH);
     gradient.addColorStop(0, newTierHsla);

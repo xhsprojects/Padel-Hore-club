@@ -29,50 +29,45 @@ export function fillTextMultiLine(
 }
 
 // Helper to load an image from a URL.
-// This version handles both data URIs and network URLs, with CORS support for the latter.
 export function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    // Handle data URIs directly, which don't need fetch or CORS.
+    // Handle data URIs directly
     if (src.startsWith('data:')) {
         const img = new Image();
         img.onload = () => resolve(img);
-        img.onerror = (err) => {
-          console.error("Data URI loading error:", err);
-          reject(new Error('Failed to load image from data URI.'));
-        };
+        img.onerror = () => reject(new Error('Failed to load data URI'));
         img.src = src;
         return;
     }
 
-    // For network URLs, use fetch to handle potential CORS issues.
-    // This creates a local blob URL, which prevents tainting the canvas.
-    fetch(src, { mode: 'cors' })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Network response was not ok for image: ${src}`);
-        }
-        return response.blob();
-      })
-      .then((blob) => {
-        const img = new Image();
-        const url = URL.createObjectURL(blob);
-        img.onload = () => {
-          // It's often better to not revoke the URL immediately,
-          // to give the canvas time to fully render the image.
-          // The browser will garbage-collect it later.
-          resolve(img);
-        };
-        img.onerror = (err) => {
-          URL.revokeObjectURL(url);
-          console.error("Image loading error from blob:", err);
-          reject(new Error(`Failed to load image from blob. Src: ${src.substring(0, 100)}...`));
-        };
-        img.src = url;
-      })
-      .catch((error) => {
-        console.error("Fetch error for image:", error);
-        reject(error);
-      });
+    // Try standard loading with crossOrigin first (faster/simpler)
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    img.onload = () => resolve(img);
+    
+    img.onerror = () => {
+        // Fallback to fetch + blob if standard loading fails
+        console.warn(`Standard load failed for ${src}, trying fetch fallback...`);
+        fetch(src, { mode: 'cors' })
+          .then(response => {
+            if (!response.ok) throw new Error('Network response error');
+            return response.blob();
+          })
+          .then(blob => {
+            const blobImg = new Image();
+            const url = URL.createObjectURL(blob);
+            blobImg.onload = () => resolve(blobImg);
+            blobImg.onerror = () => reject(new Error('Blob load failed'));
+            blobImg.src = url;
+          })
+          .catch(err => {
+            console.error("All image load attempts failed:", err);
+            reject(err);
+          });
+    };
+    
+    img.src = src;
   });
 }
 
